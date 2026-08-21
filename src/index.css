@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@layer utilities {
+  /* Modern Vibrant Gradient & Light-Mode Mirror Glass Morphs */
+  .mirror-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 250, 252, 0.78) 50%, rgba(241, 245, 249, 0.85) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.05), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+  }
+
+  .mirror-card-vibrant {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(238, 242, 255, 0.8) 50%, rgba(245, 243, 255, 0.85) 100%);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid rgba(199, 210, 254, 0.6);
+    box-shadow: 0 12px 36px -4px rgba(79, 70, 229, 0.12), inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+  }
+
+  .mirror-card-amber {
+    background: linear-gradient(135deg, rgba(255, 251, 235, 0.92) 0%, rgba(254, 243, 199, 0.8) 100%);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    box-shadow: 0 10px 25px -4px rgba(245, 158, 11, 0.12), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .mirror-card-light {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), inset 0 1px 1px 0 rgba(255, 255, 255, 1);
+  }
+
+  .specular-border {
+    position: relative;
+  }
+  
+  .specular-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.6), rgba(236, 72, 153, 0.6), rgba(245, 158, 11, 0.6), transparent);
+    z-index: 10;
+  }
+
+  .vibrant-gradient-badge {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px 0 rgba(168, 85, 247, 0.35);
+  }
+
+  .glass-pill {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  }
+
+  .charcoal-glass {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.88) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(226, 232, 240, 0.85);
+    box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.06);
+  }
+}
+

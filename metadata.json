@@ -1,0 +1,6 @@
+{
+  "name": "BrandFlow Pro",
+  "description": "Windows desktop ERP for branding and printing workflow management from quotation to dispatch.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

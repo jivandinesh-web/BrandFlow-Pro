@@ -1,0 +1,49 @@
+{
+  "entities": {
+    "Job": {
+      "title": "Job",
+      "description": "A print job",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "jobNumber": { "type": "string" },
+        "customerName": { "type": "string" },
+        "companyName": { "type": "string" },
+        "projectName": { "type": "string" },
+        "category": { "type": "string" },
+        "quantity": { "type": "number" },
+        "totalValue": { "type": "number" },
+        "stage": { "type": "string" },
+        "priority": { "type": "string" },
+        "dateCreated": { "type": "string" },
+        "deadline": { "type": "string" },
+        "assignedDesigner": { "type": "string" }
+      },
+      "required": ["id", "jobNumber", "customerName", "stage"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "A customer profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string" },
+        "name": { "type": "string" },
+        "company": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" }
+      },
+      "required": ["id", "code", "name", "company", "email"]
+    }
+  },
+  "firestore": {
+    "jobs/{jobId}": {
+      "schema": { "$ref": "#/entities/Job" },
+      "description": "Stores all print jobs"
+    },
+    "customers/{customerId}": {
+      "schema": { "$ref": "#/entities/Customer" },
+      "description": "Stores all customer profiles"
+    }
+  }
+}
