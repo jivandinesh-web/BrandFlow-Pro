@@ -13,6 +13,8 @@ import {
   Search,
   Filter,
   Check,
+  Database,
+  ShieldCheck,
 } from 'lucide-react';
 import { Job } from '../types';
 import {
@@ -21,6 +23,11 @@ import {
   sendClientReminder,
 } from '../utils/notificationHelper';
 import { EmailLink } from './EmailLink';
+import { ClientEmailSendButton } from './ClientEmailSendButton';
+import {
+  logAutoCronBatchExecution,
+  logSingleReminderExecution,
+} from '../utils/auditLogger';
 
 interface ClientFollowUpPanelProps {
   jobs: Job[];
@@ -39,6 +46,7 @@ export const ClientFollowUpPanel: React.FC<ClientFollowUpPanelProps> = ({
   );
   const [isProcessingBatch, setIsProcessingBatch] = useState(false);
   const [sentCount, setSentCount] = useState(0);
+  const [lastBatchLogTimestamp, setLastBatchLogTimestamp] = useState<string | null>(null);
 
   const filteredReminders = reminderList.filter((rem) => {
     const matchesTab = activeTab === 'ALL' || rem.type === activeTab;
@@ -49,8 +57,16 @@ export const ClientFollowUpPanel: React.FC<ClientFollowUpPanelProps> = ({
     return matchesTab && matchesSearch;
   });
 
-  const handleSendIndividual = (reminder: ClientReminder, channel: 'email' | 'whatsapp' | 'both') => {
+  const handleSendIndividual = async (reminder: ClientReminder, channel: 'email' | 'whatsapp' | 'both') => {
     sendClientReminder(reminder, channel, onSaveNotification);
+
+    const targetJob = jobs.find((j) => j.jobNumber === reminder.jobNumber);
+    await logSingleReminderExecution({
+      reminder,
+      channel,
+      job: targetJob,
+      onNotify: onSaveNotification,
+    });
 
     setReminderList((prev) =>
       prev.map((r) =>
@@ -66,33 +82,39 @@ export const ClientFollowUpPanel: React.FC<ClientFollowUpPanelProps> = ({
     setSentCount((prev) => prev + 1);
   };
 
-  const handleRun0800AMBatch = () => {
+  const handleRun0800AMBatch = async () => {
     setIsProcessingBatch(true);
-    let count = 0;
+    const pendingItems = reminderList.filter((rem) => rem.status === 'Scheduled (08:00 AM)');
 
-    setTimeout(() => {
+    // If all are already marked sent, run with the full active queue so users can trigger re-test
+    const batchTarget = pendingItems.length > 0 ? pendingItems : reminderList.slice(0, 4);
+
+    try {
+      const result = await logAutoCronBatchExecution({
+        reminders: batchTarget,
+        jobs,
+        onNotify: onSaveNotification,
+      });
+
       const updatedList = reminderList.map((rem) => {
-        if (rem.status === 'Scheduled (08:00 AM)') {
-          count++;
+        if (batchTarget.some((b) => b.id === rem.id)) {
           return {
             ...rem,
             status: 'Sent' as const,
-            sentAt: 'Today at 08:00 AM (Scheduled Batch)',
+            sentAt: `Today at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (08:00 AM Batch)`,
           };
         }
         return rem;
       });
 
       setReminderList(updatedList);
+      setSentCount((prev) => prev + batchTarget.length);
+      setLastBatchLogTimestamp(result.timestamp);
+    } catch (e) {
+      console.error('Batch logging error:', e);
+    } finally {
       setIsProcessingBatch(false);
-      setSentCount((prev) => prev + count);
-
-      if (onSaveNotification) {
-        onSaveNotification(
-          `🚀 [08:00 AM AUTOMATED BATCH EXECUTED] ${count} Email & WhatsApp "APPROVAL NEEDED" reminders dispatched to clients!`
-        );
-      }
-    }, 1200);
+    }
   };
 
   return (
@@ -140,7 +162,7 @@ export const ClientFollowUpPanel: React.FC<ClientFollowUpPanelProps> = ({
           <button
             onClick={handleRun0800AMBatch}
             disabled={isProcessingBatch}
-            className="px-4 py-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white font-bold rounded-xl text-xs shadow-md shadow-indigo-500/20 transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
+            className="px-4 py-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isProcessingBatch ? 'animate-spin' : ''}`} />
             <span>Run 08:00 AM Batch Now</span>
@@ -189,6 +211,32 @@ export const ClientFollowUpPanel: React.FC<ClientFollowUpPanelProps> = ({
             <CheckCircle2 className="w-5 h-5" />
           </div>
         </div>
+      </div>
+
+      {/* Admin Database Sync & Timestamp Status Banner */}
+      <div className="bg-slate-900 text-slate-100 rounded-xl p-3 px-4 flex flex-wrap items-center justify-between gap-2 text-xs border border-slate-800 shadow-inner">
+        <div className="flex items-center space-x-2.5">
+          <div className="p-1.5 bg-indigo-500/20 text-indigo-400 rounded-lg border border-indigo-500/30">
+            <Database className="w-3.5 h-3.5" />
+          </div>
+          <div>
+            <span className="font-bold text-slate-200">Admin Database Audit Sync:</span>{' '}
+            <span className="text-slate-400">
+              Automated cron batch executions & dispatches are automatically timestamped and permanently logged to the Admin Database.
+            </span>
+          </div>
+        </div>
+        {lastBatchLogTimestamp ? (
+          <div className="flex items-center space-x-1.5 font-mono text-[11px] bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-lg">
+            <ShieldCheck className="w-3 h-3 text-emerald-400" />
+            <span>Last Batch Logged: <strong>{lastBatchLogTimestamp}</strong></span>
+          </div>
+        ) : (
+          <div className="flex items-center space-x-1.5 font-mono text-[11px] bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg">
+            <Clock className="w-3 h-3 text-indigo-400" />
+            <span>Target Batch: <strong>Daily at 08:00:00 AM</strong></span>
+          </div>
+        )}
       </div>
 
       {/* Filter and Search controls */}
@@ -331,27 +379,45 @@ export const ClientFollowUpPanel: React.FC<ClientFollowUpPanelProps> = ({
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleSendIndividual(rem, 'email')}
-                    className="px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-lg text-[11px] border border-slate-200 shadow-2xs transition-all flex items-center space-x-1 cursor-pointer"
-                  >
-                    <Mail className="w-3 h-3 text-indigo-600" />
-                    <span>Send Email</span>
-                  </button>
+                  <ClientEmailSendButton
+                    toEmail={rem.clientEmail}
+                    clientName={rem.clientName}
+                    companyName={rem.clientName}
+                    jobNumber={rem.jobNumber}
+                    defaultSubject={rem.emailSubject}
+                    defaultBody={rem.whatsappMessage}
+                    label="Re-Send Email to Client"
+                    variant="emerald"
+                    onSaveNotification={onSaveNotification}
+                    onEmailSent={() => {
+                      setReminderList((prev) =>
+                        prev.map((r) =>
+                          r.id === rem.id
+                            ? {
+                                ...r,
+                                status: 'Sent',
+                                sentAt: `Today at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+                              }
+                            : r
+                        )
+                      );
+                      setSentCount((prev) => prev + 1);
+                    }}
+                  />
 
                   <button
                     onClick={() => handleSendIndividual(rem, 'whatsapp')}
-                    className="px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-lg text-[11px] border border-slate-200 shadow-2xs transition-all flex items-center space-x-1 cursor-pointer"
+                    className="px-3 py-1 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-indigo-600 font-bold rounded-lg text-[11px] shadow-2xs transition-all flex items-center space-x-1 cursor-pointer"
                   >
-                    <MessageSquare className="w-3 h-3 text-emerald-600" />
+                    <MessageSquare className="w-3 h-3" />
                     <span>Send WhatsApp</span>
                   </button>
 
                   <button
                     onClick={() => handleSendIndividual(rem, 'both')}
-                    className="px-3.5 py-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white font-bold rounded-lg text-[11px] shadow-sm shadow-indigo-500/20 transition-all flex items-center space-x-1 cursor-pointer"
+                    className="px-3.5 py-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold rounded-lg text-[11px] shadow-sm transition-all flex items-center space-x-1 cursor-pointer"
                   >
-                    <Send className="w-3 h-3 text-white" />
+                    <Send className="w-3 h-3" />
                     <span>Send Both Now</span>
                   </button>
                 </div>

@@ -34,6 +34,39 @@
         "phone": { "type": "string" }
       },
       "required": ["id", "code", "name", "company", "email"]
+    },
+    "ClientEmailLog": {
+      "title": "ClientEmailLog",
+      "description": "Logs emails dispatched to clients via 5 popular mailing programs",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "company": { "type": "string" },
+        "clientEmail": { "type": "string" },
+        "jobNumber": { "type": "string" },
+        "quoteNumber": { "type": "string" },
+        "projectName": { "type": "string" },
+        "subject": { "type": "string" },
+        "bodySnippet": { "type": "string" },
+        "mailProgram": { "type": "string" },
+        "status": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "isoTimestamp": { "type": "string" },
+        "sentBy": { "type": "string" }
+      },
+      "required": ["id", "clientName", "company", "clientEmail", "mailProgram", "timestamp", "status"]
+    },
+    "UserConsentLog": {
+      "title": "UserConsentLog",
+      "description": "Logs user consent actions",
+      "type": "object",
+      "properties": {
+        "action": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["action", "timestamp"]
     }
   },
   "firestore": {
@@ -44,6 +77,14 @@
     "customers/{customerId}": {
       "schema": { "$ref": "#/entities/Customer" },
       "description": "Stores all customer profiles"
+    },
+    "email_logs/{logId}": {
+      "schema": { "$ref": "#/entities/ClientEmailLog" },
+      "description": "Stores client email database audit logs"
+    },
+    "user_consent_logs/{logId}": {
+      "schema": { "$ref": "#/entities/UserConsentLog" },
+      "description": "Logs user consent actions"
     }
   }
 }

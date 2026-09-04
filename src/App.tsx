@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, doc, setDoc, getDocs, writeBatch } from 'firebase/firestore';
+import { motion, AnimatePresence } from 'motion/react';
 import { db } from './lib/firebase';
 import { Customer, Job, ModuleType, UserRole } from './types';
 import { INITIAL_ASSETS, INITIAL_CUSTOMERS, INITIAL_JOBS } from './data/mockData';
@@ -155,157 +156,168 @@ export default function App() {
       />
 
       {/* Module Dynamic Render Area */}
-      <div className="min-h-full">
-        {activeModule === 'Dashboard' && (
-          <DashboardModule
-            jobs={jobs}
-            onNavigate={handleNavigate}
-            onSelectJob={setSelectedJob}
-            onSaveJob={handleSaveJob}
-            onSaveNotification={showNotification}
-            isEditing={isEditing}
-          />
-        )}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeModule}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          className="min-h-full"
+        >
+          {activeModule === 'Dashboard' && (
+            <DashboardModule
+              jobs={jobs}
+              onNavigate={handleNavigate}
+              onSelectJob={setSelectedJob}
+              onSaveJob={handleSaveJob}
+              onSaveNotification={showNotification}
+              isEditing={isEditing}
+            />
+          )}
 
-        {activeModule === 'Customers' && (
-          <CustomersModule
-            customers={customers}
-            isEditing={isEditing}
-            onSaveNotification={showNotification}
-            onAddCustomer={handleAddCustomer}
-            onUpdateCustomer={handleUpdateCustomer}
-          />
-        )}
+          {activeModule === 'Customers' && (
+            <CustomersModule
+              customers={customers}
+              isEditing={isEditing}
+              onSaveNotification={showNotification}
+              onAddCustomer={handleAddCustomer}
+              onUpdateCustomer={handleUpdateCustomer}
+            />
+          )}
 
-        {activeModule === 'Quotations' && (
-          <QuotationsModule
-            job={selectedJob}
-            allJobs={jobs}
-            onSaveJob={handleSaveJob}
-            onSelectJob={setSelectedJob}
-            isEditing={isEditing}
-            onSaveNotification={showNotification}
-            onNavigate={handleNavigate}
-          />
-        )}
+          {activeModule === 'Quotations' && (
+            <QuotationsModule
+              job={selectedJob}
+              allJobs={jobs}
+              onSaveJob={handleSaveJob}
+              onSelectJob={setSelectedJob}
+              isEditing={isEditing}
+              onSaveNotification={showNotification}
+              onNavigate={handleNavigate}
+            />
+          )}
 
-        {activeModule === 'ClientQuote' && (
-          <ClientQuoteModule
-            job={selectedJob}
-            onSaveNotification={showNotification}
-            onNavigate={handleNavigate}
-          />
-        )}
+          {activeModule === 'ClientQuote' && (
+            <ClientQuoteModule
+              job={selectedJob}
+              onSaveNotification={showNotification}
+              onNavigate={handleNavigate}
+            />
+          )}
 
-        {activeModule === 'Approval' && (
-          <ApprovalModule
-            job={selectedJob}
-            onSaveNotification={showNotification}
-            onNavigate={handleNavigate}
-          />
-        )}
+          {activeModule === 'Approval' && (
+            <ApprovalModule
+              job={selectedJob}
+              onSaveNotification={showNotification}
+              onNavigate={handleNavigate}
+            />
+          )}
 
-        {activeModule === 'ArtworkUpload' && (
-          <ArtworkUploadModule
-            job={selectedJob}
-            isEditing={isEditing}
-            onSaveNotification={showNotification}
-            onNavigate={handleNavigate}
-            onSaveJob={handleSaveJob}
-          />
-        )}
+          {activeModule === 'ArtworkUpload' && (
+            <ArtworkUploadModule
+              job={selectedJob}
+              isEditing={isEditing}
+              onSaveNotification={showNotification}
+              onNavigate={handleNavigate}
+              onSaveJob={handleSaveJob}
+            />
+          )}
 
-        {activeModule === 'Design' && (
-          <DesignModule
-            job={selectedJob}
-            currentRole={currentRole}
-            isEditing={isEditing}
-            onSaveNotification={showNotification}
-            onNavigate={handleNavigate}
-          />
-        )}
+          {activeModule === 'Design' && (
+            <DesignModule
+              job={selectedJob}
+              currentRole={currentRole}
+              isEditing={isEditing}
+              onSaveNotification={showNotification}
+              onNavigate={handleNavigate}
+            />
+          )}
 
-        {activeModule === 'PdfProofApproval' && (
-          <PdfProofApprovalModule
-            job={selectedJob}
-            currentRole={currentRole}
-            onSaveNotification={showNotification}
-            onNavigate={handleNavigate}
-          />
-        )}
+          {activeModule === 'PdfProofApproval' && (
+            <PdfProofApprovalModule
+              job={selectedJob}
+              currentRole={currentRole}
+              onSaveNotification={showNotification}
+              onNavigate={handleNavigate}
+            />
+          )}
 
-        {activeModule === 'Production' && (
-          <ProductionModule
-            job={selectedJob}
-            isEditing={isEditing}
-            onSaveNotification={showNotification}
-            onNavigate={handleNavigate}
-          />
-        )}
+          {activeModule === 'Production' && (
+            <ProductionModule
+              job={selectedJob}
+              isEditing={isEditing}
+              onSaveNotification={showNotification}
+              onNavigate={handleNavigate}
+            />
+          )}
 
-        {activeModule === 'QualityControl' && (
-          <QualityControlModule
-            job={selectedJob}
-            isEditing={isEditing}
-            onSaveNotification={showNotification}
-            onNavigate={handleNavigate}
-          />
-        )}
+          {activeModule === 'QualityControl' && (
+            <QualityControlModule
+              job={selectedJob}
+              isEditing={isEditing}
+              onSaveNotification={showNotification}
+              onNavigate={handleNavigate}
+            />
+          )}
 
-        {activeModule === 'Accounts' && (
-          <AccountsModule
-            job={selectedJob}
-            isEditing={isEditing}
-            onSaveNotification={showNotification}
-            onNavigate={handleNavigate}
-          />
-        )}
+          {activeModule === 'Accounts' && (
+            <AccountsModule
+              job={selectedJob}
+              isEditing={isEditing}
+              onSaveNotification={showNotification}
+              onNavigate={handleNavigate}
+            />
+          )}
 
-        {activeModule === 'PaymentTracking' && (
-          <PaymentTrackingModule
-            job={selectedJob}
-            isEditing={isEditing}
-            onSaveNotification={showNotification}
-            onNavigate={handleNavigate}
-          />
-        )}
+          {activeModule === 'PaymentTracking' && (
+            <PaymentTrackingModule
+              job={selectedJob}
+              isEditing={isEditing}
+              onSaveNotification={showNotification}
+              onNavigate={handleNavigate}
+            />
+          )}
 
-        {activeModule === 'Dispatch' && (
-          <DispatchModule
-            job={selectedJob}
-            isEditing={isEditing}
-            onSaveNotification={showNotification}
-            onNavigate={handleNavigate}
-          />
-        )}
+          {activeModule === 'Dispatch' && (
+            <DispatchModule
+              job={selectedJob}
+              isEditing={isEditing}
+              onSaveNotification={showNotification}
+              onNavigate={handleNavigate}
+            />
+          )}
 
-        {activeModule === 'Reports' && (
-          <ReportsModule
-            jobs={jobs}
-            onSaveNotification={showNotification}
-          />
-        )}
+          {activeModule === 'Reports' && (
+            <ReportsModule
+              jobs={jobs}
+              onSaveNotification={showNotification}
+            />
+          )}
 
-        {activeModule === 'AssetLibrary' && (
-          <AssetLibraryModule
-            assets={INITIAL_ASSETS}
-            onSaveNotification={showNotification}
-          />
-        )}
+          {activeModule === 'AssetLibrary' && (
+            <AssetLibraryModule
+              assets={INITIAL_ASSETS}
+              onSaveNotification={showNotification}
+            />
+          )}
 
-        {activeModule === 'UserManagement' && (
-          <UserManagementModule
-            currentRole={currentRole}
-            onSaveNotification={showNotification}
-          />
-        )}
+          {activeModule === 'UserManagement' && (
+            <UserManagementModule
+              currentRole={currentRole}
+              onSaveNotification={showNotification}
+              isEditing={isEditing}
+              setIsEditing={setIsEditing}
+            />
+          )}
 
-        {activeModule === 'Settings' && (
-          <SettingsModule
-            onSaveNotification={showNotification}
-          />
-        )}
-      </div>
+          {activeModule === 'Settings' && (
+            <SettingsModule
+              onSaveNotification={showNotification}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
     </DesktopFrame>
   );
 }

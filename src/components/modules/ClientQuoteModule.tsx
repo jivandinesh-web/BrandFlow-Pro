@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Send, FileText, CheckCircle2, Clock, ShieldCheck, Printer, Mail } from 'lucide-react';
 import { Job } from '../../types';
 import { EmailLink } from '../EmailLink';
+import { ClientEmailSendButton } from '../ClientEmailSendButton';
+import { ClientEmailLogsCard } from '../ClientEmailLogsCard';
 
 interface ClientQuoteModuleProps {
   job: Job;
@@ -16,10 +18,12 @@ export const ClientQuoteModule: React.FC<ClientQuoteModuleProps> = ({
 }) => {
   const [sent, setSent] = useState(job.quote.status === 'Sent to Client' || job.quote.status === 'Approved');
 
-  const handleSendQuote = () => {
-    setSent(true);
-    onSaveNotification(`Formal Quotator document emailed to ${job.customerName} (${job.companyName})`);
-  };
+  const customerEmail =
+    job.customerEmail ||
+    `${job.customerName.toLowerCase().replace(/\s+/g, '.')}@${job.companyName.toLowerCase().replace(/\s+/g, '')}.co.za`;
+
+  const quoteEmailSubject = `Formal Client Quotation #${job.quote.quoteNumber} - ${job.companyName} (${job.projectName})`;
+  const quoteEmailBody = `Dear ${job.customerName},\n\nPlease find attached the formal quotation #${job.quote.quoteNumber} for your project "${job.projectName}".\n\nTotal Amount: R ${job.quote.totalAmount.toLocaleString()}\nValid Until: ${job.quote.validUntil}\nSales Rep: ${job.quote.salesRep}\n\nYou can review, approve, or request revisions directly through our client portal.\n\nThank you for choosing BrandFlow Pro!\n\nBest regards,\nBrandFlow Pro Client Services\nwww.brandflowpro.co.za`;
 
   return (
     <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-zinc-950 min-h-full">
@@ -34,18 +38,24 @@ export const ClientQuoteModule: React.FC<ClientQuoteModuleProps> = ({
           </h2>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={handleSendQuote}
-            className={`px-4 py-2 text-xs font-bold rounded-lg flex items-center space-x-1.5 shadow-md cursor-pointer transition-all ${
-              sent
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30'
-                : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black shadow-amber-500/20 border border-amber-300/30'
-            }`}
-          >
-            <Mail className="w-4 h-4" />
-            <span>{sent ? 'Re-Send Email to Client' : 'Send Quote to Client Email'}</span>
-          </button>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Linked to all 5 popular mailing programs & auto-logged to database with timestamp */}
+          <ClientEmailSendButton
+            toEmail={customerEmail}
+            clientName={job.customerName}
+            companyName={job.companyName}
+            clientId={job.quote.customerId}
+            jobNumber={job.jobNumber}
+            quoteNumber={job.quote.quoteNumber}
+            projectName={job.projectName}
+            defaultSubject={quoteEmailSubject}
+            defaultBody={quoteEmailBody}
+            label={sent ? 'Re-Send Email to Client' : 'Send Quote to Client Email'}
+            variant="emerald"
+            onEmailSent={() => setSent(true)}
+            onSaveNotification={onSaveNotification}
+          />
+
           <button
             onClick={() => onNavigate('Approval')}
             className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 rounded-lg text-xs font-bold flex items-center space-x-1 cursor-pointer transition-all"
@@ -238,6 +248,20 @@ export const ClientQuoteModule: React.FC<ClientQuoteModuleProps> = ({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Client Database Email Log History Section */}
+      <div className="max-w-4xl mx-auto">
+        <ClientEmailLogsCard
+          clientId={job.quote.customerId}
+          clientName={job.customerName}
+          companyName={job.companyName}
+          clientEmail={customerEmail}
+          jobNumber={job.jobNumber}
+          quoteNumber={job.quote.quoteNumber}
+          title={`Database Email Log — ${job.companyName} (#${job.quote.quoteNumber})`}
+          onSaveNotification={onSaveNotification}
+        />
       </div>
     </div>
   );

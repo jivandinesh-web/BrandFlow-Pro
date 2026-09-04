@@ -21,6 +21,7 @@ export interface ClientReminder {
   scheduledTime: string; // e.g., 'Daily at 08:00 AM'
   status: 'Scheduled (08:00 AM)' | 'Sent' | 'Failed' | 'Paused';
   emailSubject: string;
+  emailBody: string;
   whatsappMessage: string;
   sentAt?: string;
   approvalStatus: 'APPROVAL NEEDED';
@@ -51,6 +52,10 @@ export function generateClientReminders(jobs: Job[]): ClientReminder[] {
     const projTitle = job.projectName || job.category || 'Printing Project';
 
     if (isQuotePending) {
+      const quoteNum = job.quote?.quoteNumber || job.jobNumber;
+      const quoteSubj = `APPROVAL NEEDED: Quotation #${quoteNum} - ${projTitle}`;
+      const quoteBody = `Dear ${job.customerName || 'Client'},\n\nPlease review and approve your formal Quotation #${quoteNum} for "${projTitle}".\n\nApproval Link: https://printcraft.io/quote/${job.jobNumber}\n\nThank you,\nBrandFlow Pro Team`;
+
       reminders.push({
         id: `rem-q-${job.id}`,
         jobId: job.id,
@@ -61,14 +66,18 @@ export function generateClientReminders(jobs: Job[]): ClientReminder[] {
         type: 'QUOTATION',
         scheduledTime: 'Tomorrow at 08:00 AM',
         status: 'Scheduled (08:00 AM)',
-        emailSubject: `APPROVAL NEEDED: Quotation #${job.quote?.quoteNumber || job.jobNumber} - ${projTitle}`,
-        whatsappMessage: `Hello ${job.customerName || 'Client'}, APPROVAL NEEDED for Quotation #${job.quote?.quoteNumber || job.jobNumber} (${projTitle}). Please review & approve: https://printcraft.io/quote/${job.jobNumber}`,
+        emailSubject: quoteSubj,
+        emailBody: quoteBody,
+        whatsappMessage: `Hello ${job.customerName || 'Client'}, APPROVAL NEEDED for Quotation #${quoteNum} (${projTitle}). Please review & approve: https://printcraft.io/quote/${job.jobNumber}`,
         approvalStatus: 'APPROVAL NEEDED',
         dateSent: job.quote?.dateCreated || job.dateCreated || '2026-07-20',
       });
     }
 
     if (isArtworkPending) {
+      const artSubj = `APPROVAL NEEDED: Artwork Proof #${job.jobNumber} - ${projTitle}`;
+      const artBody = `Dear ${job.customerName || 'Client'},\n\nYour digital print proof for project "${projTitle}" (Job #${job.jobNumber}) is ready for sign-off.\n\nApproval Link: https://printcraft.io/proof/${job.jobNumber}\n\nThank you,\nBrandFlow Design Team`;
+
       reminders.push({
         id: `rem-a-${job.id}`,
         jobId: job.id,
@@ -79,7 +88,8 @@ export function generateClientReminders(jobs: Job[]): ClientReminder[] {
         type: 'ARTWORK',
         scheduledTime: 'Tomorrow at 08:00 AM',
         status: 'Scheduled (08:00 AM)',
-        emailSubject: `APPROVAL NEEDED: Artwork Proof #${job.jobNumber} - ${projTitle}`,
+        emailSubject: artSubj,
+        emailBody: artBody,
         whatsappMessage: `Hello ${job.customerName || 'Client'}, APPROVAL NEEDED for Artwork Proof #${job.jobNumber} (${projTitle}). Please verify CMYK colors & layout: https://printcraft.io/proof/${job.jobNumber}`,
         approvalStatus: 'APPROVAL NEEDED',
         dateSent: job.artworkVersions?.[0]?.uploadedAt || job.dateCreated || '2026-07-21',

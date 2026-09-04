@@ -2,6 +2,8 @@ import React from 'react';
 import { CheckCircle2, Clock, AlertCircle, FileCheck, Send, Shield, User, ArrowRight, Mail } from 'lucide-react';
 import { Job } from '../../types';
 import { EmailLink } from '../EmailLink';
+import { ClientEmailSendButton } from '../ClientEmailSendButton';
+import { ClientEmailLogsCard } from '../ClientEmailLogsCard';
 
 interface ApprovalModuleProps {
   job: Job;
@@ -14,6 +16,13 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({
   onSaveNotification,
   onNavigate,
 }) => {
+  const customerEmail =
+    job.customerEmail ||
+    `${job.customerName.toLowerCase().replace(/\s+/g, '.')}@${job.companyName.toLowerCase().replace(/\s+/g, '')}.co.za`;
+
+  const proofSubject = `URGENT: High-Res Artwork Proof Approval Required - ${job.projectName} (#${job.jobNumber})`;
+  const proofBody = `Dear ${job.customerName},\n\nYour high-resolution print proof for project "${job.projectName}" (Job #${job.jobNumber}) is ready for your digital review and sign-off on the BrandFlow Approval Portal.\n\nPlease review and approve at your earliest convenience so we can proceed with scheduled press production.\n\nThank you,\nBrandFlow Pro Production Team\nwww.brandflowpro.co.za`;
+
   return (
     <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-zinc-950 min-h-full">
       {/* Top Banner */}
@@ -28,21 +37,44 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({
             <span>Client: <strong className="text-amber-300">{job.companyName}</strong> ({job.customerName})</span>
             <span className="text-zinc-600">•</span>
             <EmailLink
-              email={job.customerEmail || `${job.customerName.toLowerCase().replace(/\s+/g, '.')}@${job.companyName.toLowerCase().replace(/\s+/g, '')}.co.za`}
-              subject={`High-Res Artwork Proof Approval - ${job.projectName}`}
+              email={customerEmail}
+              clientName={job.customerName}
+              companyName={job.companyName}
+              jobNumber={job.jobNumber}
+              projectName={job.projectName}
+              subject={proofSubject}
+              body={proofBody}
               showIcon
               className="text-amber-400 hover:text-amber-300 text-xs"
             />
           </div>
         </div>
 
-        <button
-          onClick={() => onNavigate('PdfProofApproval')}
-          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-lg text-xs font-black flex items-center space-x-1.5 shadow-md shadow-amber-500/20 cursor-pointer transition-all border border-amber-300/30"
-        >
-          <span>Open Interactive PDF Proof Studio</span>
-          <ArrowRight className="w-4 h-4 text-zinc-950" />
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Button linked to 5 popular mailing programs & database log */}
+          <ClientEmailSendButton
+            toEmail={customerEmail}
+            clientName={job.customerName}
+            companyName={job.companyName}
+            clientId={job.quote?.customerId}
+            jobNumber={job.jobNumber}
+            quoteNumber={job.quote?.quoteNumber}
+            projectName={job.projectName}
+            defaultSubject={proofSubject}
+            defaultBody={proofBody}
+            label="Re-Send Email to Client"
+            variant="emerald"
+            onSaveNotification={onSaveNotification}
+          />
+
+          <button
+            onClick={() => onNavigate('PdfProofApproval')}
+            className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-lg text-xs font-black flex items-center space-x-1.5 shadow-md shadow-amber-500/20 cursor-pointer transition-all border border-amber-300/30"
+          >
+            <span>Open Interactive PDF Proof Studio</span>
+            <ArrowRight className="w-4 h-4 text-zinc-950" />
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -112,29 +144,38 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({
           <div className="space-y-3 text-xs">
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="font-bold text-zinc-300">Send Automated Reminder SMS / Email</label>
+                <label className="font-bold text-zinc-300">Direct Client Email Dispatch</label>
                 <EmailLink
-                  email={job.customerEmail || `${job.customerName.toLowerCase().replace(/\s+/g, '.')}@${job.companyName.toLowerCase().replace(/\s+/g, '')}.co.za`}
-                  subject={`URGENT Proof Approval Required - ${job.projectName}`}
-                  body={`Dear ${job.customerName},\n\nYour high-resolution print proof for ${job.projectName} is ready for digital review and approval on the BrandFlow Portal.\n\nPlease review the proof at your earliest convenience to maintain scheduled press time.\n\nWarm regards,\nBrandFlow Production Team`}
+                  email={customerEmail}
+                  clientName={job.customerName}
+                  companyName={job.companyName}
+                  jobNumber={job.jobNumber}
+                  projectName={job.projectName}
+                  subject={proofSubject}
+                  body={proofBody}
                   showQuickActions
                   className="text-amber-400 font-semibold text-[11px]"
                 />
               </div>
-              <textarea
-                rows={3}
-                defaultValue={`Dear ${job.customerName}, your high-res print proof for ${job.projectName} is ready for digital approval on the BrandFlow Portal.`}
-                className="w-full p-3 bg-zinc-950 border border-zinc-700/80 rounded-lg text-xs font-medium text-zinc-100 placeholder-zinc-500 focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 outline-none"
-              />
+              <div className="p-3 bg-zinc-950 border border-zinc-800 rounded-lg text-xs text-zinc-300 font-mono">
+                {proofBody.slice(0, 140)}...
+              </div>
             </div>
 
-            <button
-              onClick={() => onSaveNotification('Reminder SMS & Email dispatched to client')}
-              className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black rounded-lg text-xs shadow-md shadow-amber-500/20 cursor-pointer flex justify-center items-center space-x-1.5 transition-all"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>Send Approval Reminder</span>
-            </button>
+            <ClientEmailSendButton
+              toEmail={customerEmail}
+              clientName={job.customerName}
+              companyName={job.companyName}
+              clientId={job.quote?.customerId}
+              jobNumber={job.jobNumber}
+              projectName={job.projectName}
+              defaultSubject={proofSubject}
+              defaultBody={proofBody}
+              label="Re-Send Email to Client"
+              variant="emerald"
+              className="w-full justify-center"
+              onSaveNotification={onSaveNotification}
+            />
           </div>
 
           <div className="p-3.5 bg-zinc-950/70 border border-zinc-800 rounded-lg text-xs text-zinc-300 space-y-1">
@@ -143,11 +184,22 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({
               <span>Legal Audit Trail</span>
             </div>
             <p className="text-[11px] text-zinc-400 leading-relaxed">
-              Upon approval, digital signature hash and IP timestamp are locked permanently into the job card.
+              Upon approval, digital signature hash and IP timestamp are locked permanently into the job card and database log.
             </p>
           </div>
         </div>
       </div>
+
+      {/* Database Email Log for this client */}
+      <ClientEmailLogsCard
+        clientId={job.quote?.customerId}
+        clientName={job.customerName}
+        companyName={job.companyName}
+        clientEmail={customerEmail}
+        jobNumber={job.jobNumber}
+        title={`Database Communication & Proof Audit Logs — ${job.companyName} (#${job.jobNumber})`}
+        onSaveNotification={onSaveNotification}
+      />
     </div>
   );
 };

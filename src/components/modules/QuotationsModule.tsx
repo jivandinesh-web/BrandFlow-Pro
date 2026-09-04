@@ -1270,10 +1270,10 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
           {/* PRIMARY BUTTON: ADD NEW QUOTE */}
           <button
             onClick={() => setShowCreateNewQuoteModal(true)}
-            className="px-4 py-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 hover:from-indigo-500 hover:to-pink-400 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-md shadow-indigo-500/20 cursor-pointer transition-all border border-white/40"
+            className="btn-amber-charcoal px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-md cursor-pointer transition-all hover:opacity-90"
             title="Create a new quote from scratch for a new or existing client"
           >
-            <Plus className="w-4 h-4 text-white" />
+            <Plus className="w-4 h-4" />
             <span>+ Create New Quote</span>
           </button>
 
@@ -1287,17 +1287,17 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
               setEditDiscountPercent(discountPercent);
               setShowEditQuoteModal(true);
             }}
-            className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold flex items-center space-x-1.5 cursor-pointer transition-colors shadow-2xs"
+            className="btn-amber-charcoal px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 cursor-pointer transition-colors shadow-2xs hover:opacity-90"
             title="Edit quote client, title, discount rate, and line items"
           >
-            <Edit3 className="w-4 h-4 text-indigo-600" />
+            <Edit3 className="w-4 h-4" />
             <span>Edit Quote</span>
           </button>
 
           {/* PRINT QUOTE BUTTON */}
           <button
             onClick={handleTriggerPrint}
-            className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold rounded-xl text-xs flex items-center space-x-1.5 shadow-2xs cursor-pointer transition-colors"
+            className="btn-amber-charcoal px-3.5 py-2 font-bold rounded-xl text-xs flex items-center space-x-1.5 shadow-2xs cursor-pointer transition-colors hover:opacity-90"
             title="Print formal quotation document"
           >
             <Printer className="w-4 h-4 text-zinc-950" />

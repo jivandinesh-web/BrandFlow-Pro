@@ -214,6 +214,31 @@ export interface SystemActivity {
   priority?: 'High' | 'Medium' | 'Low' | 'Urgent';
 }
 
+export type PopularMailProgram =
+  | 'Gmail'
+  | 'Outlook (Office 365)'
+  | 'Yahoo Mail'
+  | 'Apple / iCloud Mail'
+  | 'Default Mail Client';
+
+export interface ClientEmailLog {
+  id: string;
+  clientId?: string;
+  clientName: string;
+  company: string;
+  clientEmail: string;
+  jobNumber?: string;
+  quoteNumber?: string;
+  projectName?: string;
+  subject: string;
+  bodySnippet: string;
+  mailProgram: PopularMailProgram | string;
+  status: 'Sent' | 'Dispatched' | 'Delivered';
+  timestamp: string;
+  isoTimestamp: string;
+  sentBy: string;
+}
+
 export interface Job {
   id: string;
   jobNumber: string;

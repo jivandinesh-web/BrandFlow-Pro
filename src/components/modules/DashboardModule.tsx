@@ -1,24 +1,6 @@
-import React, { useState } from 'react';
-import {
-  TrendingUp,
-  FileText,
-  Clock,
-  CheckCircle2,
-  AlertTriangle,
-  Printer,
-  DollarSign,
-  Package,
-  Plus,
-  ArrowRight,
-  ShieldCheck,
-  Users,
-  Activity,
-  Upload,
-  Truck,
-  RotateCcw,
-  ExternalLink,
-  Filter,
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
+import { Activity, Upload, Truck, RotateCcw, ExternalLink, Filter, Sparkles, TrendingUp, TrendingDown, FileText, Clock, CheckCircle2, AlertTriangle, Printer, DollarSign, Package, Plus, ArrowRight, ShieldCheck, Users, Database } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Job, ModuleType, SystemActivity } from '../../types';
 import {
@@ -28,6 +10,7 @@ import {
   triggerDispatchNotification,
 } from '../../utils/notificationHelper';
 import { ClientFollowUpPanel } from '../ClientFollowUpPanel';
+import { getStoredAdminSystemActivities } from '../../utils/auditLogger';
 
 interface DashboardModuleProps {
   jobs: Job[];
@@ -161,6 +144,19 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
 }) => {
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>('All');
   const [activePriorityFilter, setActivePriorityFilter] = useState<string>('All');
+  const [storedAdminActivities, setStoredAdminActivities] = useState<SystemActivity[]>(() =>
+    getStoredAdminSystemActivities()
+  );
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setStoredAdminActivities(getStoredAdminSystemActivities());
+    };
+    window.addEventListener('brandflow:system_activities_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('brandflow:system_activities_updated', handleUpdate);
+    };
+  }, []);
 
   const totalRevenue = jobs.reduce((sum, j) => sum + j.totalValue, 0);
   const activeJobsCount = jobs.filter((j) => j.stage !== 'Completed').length;
@@ -195,8 +191,8 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
       : 'Medium',
   }));
 
-  // Combine and deduplicate / cap to 10 items
-  const combinedActivities = [...dynamicJobActivities, ...INITIAL_SYSTEM_ACTIVITIES];
+  // Combine stored admin database logs (highest priority first), live job updates, and baseline mock activities
+  const combinedActivities = [...storedAdminActivities, ...dynamicJobActivities, ...INITIAL_SYSTEM_ACTIVITIES];
   const uniqueActivitiesMap = new Map<string, SystemActivity>();
   combinedActivities.forEach((act) => {
     if (!uniqueActivitiesMap.has(act.id)) {
@@ -208,10 +204,21 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
 
   const filteredActivities = allActivitiesList.filter((act) => {
     let categoryMatch = true;
-    if (activeCategoryFilter === 'Updates') categoryMatch = act.category === 'Job Update' || act.category === 'Press Status';
-    else if (activeCategoryFilter === 'Proofs') categoryMatch = act.category === 'Proof Approval' || act.category === 'Artwork Upload';
-    else if (activeCategoryFilter === 'QC & Accounts') categoryMatch = act.category === 'QC Inspection' || act.category === 'Invoicing';
-    else if (activeCategoryFilter === 'Dispatch') categoryMatch = act.category === 'Dispatch' || act.category === 'Quotation';
+    if (activeCategoryFilter === 'Auto Cron') {
+      categoryMatch =
+        act.description.includes('CRON') ||
+        act.description.includes('Cron') ||
+        act.user.includes('Cron') ||
+        act.statusBadge?.includes('Cron') === true;
+    } else if (activeCategoryFilter === 'Updates') {
+      categoryMatch = act.category === 'Job Update' || act.category === 'Press Status';
+    } else if (activeCategoryFilter === 'Proofs') {
+      categoryMatch = act.category === 'Proof Approval' || act.category === 'Artwork Upload';
+    } else if (activeCategoryFilter === 'QC & Accounts') {
+      categoryMatch = act.category === 'QC Inspection' || act.category === 'Invoicing';
+    } else if (activeCategoryFilter === 'Dispatch') {
+      categoryMatch = act.category === 'Dispatch' || act.category === 'Quotation';
+    }
 
     let priorityMatch = true;
     if (activePriorityFilter !== 'All') {
@@ -221,8 +228,20 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
     return categoryMatch && priorityMatch;
   });
 
-  // Limit strictly to last 10 actions performed across the system
-  const last10Activities = filteredActivities.slice(0, 10);
+  // Limit strictly to last 15 actions performed across the system
+  const last10Activities = filteredActivities.slice(0, 15);
+
+  const getSafeTimestampDisplay = (timeStr: string) => {
+    try {
+      const parsed = new Date(timeStr.includes('T') ? timeStr : timeStr.replace(' ', 'T'));
+      if (!isNaN(parsed.getTime())) {
+        return formatDistanceToNow(parsed, { addSuffix: true });
+      }
+    } catch (e) {
+      // ignore
+    }
+    return timeStr;
+  };
 
   const renderPriorityBadge = (priority?: SystemActivity['priority']) => {
     if (!priority) return null;
@@ -329,6 +348,113 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
 
   return (
     <div className="p-6 space-y-6 font-sans text-slate-800 bg-transparent min-h-full">
+      {/* KPI Cards: Consistent 4-column grid on desktop, 2-column on tablet, 1 on mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* KPI 1: Active Jobs Queue */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.05 }}
+          onClick={() => onNavigate('Production')}
+          className="mirror-card rounded-2xl p-4.5 border border-white/10 hover:border-indigo-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-lg relative overflow-hidden group"
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Active Press Queue</p>
+              <h3 className="text-2xl font-black text-white mt-1 tracking-tight">{activeJobsCount} Jobs</h3>
+            </div>
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25 group-hover:scale-110 transition-transform">
+              <Package className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">
+              <TrendingUp className="w-3 h-3 text-emerald-400" />
+              +14.2% this wk
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium font-mono">{urgentCount} Urgent</span>
+          </div>
+        </motion.div>
+
+        {/* KPI 2: Pipeline Revenue */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.1 }}
+          onClick={() => onNavigate('Accounts')}
+          className="mirror-card rounded-2xl p-4.5 border border-white/10 hover:border-indigo-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-lg relative overflow-hidden group"
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Monthly Revenue</p>
+              <h3 className="text-2xl font-black text-white mt-1 tracking-tight">R {totalRevenue.toLocaleString()}</h3>
+            </div>
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 group-hover:scale-110 transition-transform">
+              <DollarSign className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">
+              <TrendingUp className="w-3 h-3 text-emerald-400" />
+              +8.5% vs target
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium font-mono">100% Invoiced</span>
+          </div>
+        </motion.div>
+
+        {/* KPI 3: Proofs & Approvals */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.15 }}
+          onClick={() => onNavigate('PdfProofApproval')}
+          className="mirror-card rounded-2xl p-4.5 border border-white/10 hover:border-indigo-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-lg relative overflow-hidden group"
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Client Proofs Queue</p>
+              <h3 className="text-2xl font-black text-white mt-1 tracking-tight">{pendingProofCount} Pending</h3>
+            </div>
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/25 group-hover:scale-110 transition-transform">
+              <FileText className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1 text-[11px] font-bold text-amber-300 bg-amber-950/60 border border-amber-800/60 px-2 py-0.5 rounded-full">
+              <Clock className="w-3 h-3 text-amber-300" />
+              1.8 hr avg turnaround
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium font-mono">Crypto Signed</span>
+          </div>
+        </motion.div>
+
+        {/* KPI 4: Quality & Efficiency */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.2 }}
+          onClick={() => onNavigate('QualityControl')}
+          className="mirror-card rounded-2xl p-4.5 border border-white/10 hover:border-indigo-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-lg relative overflow-hidden group"
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">QC & Press Yield</p>
+              <h3 className="text-2xl font-black text-white mt-1 tracking-tight">99.2% PASS</h3>
+            </div>
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-md shadow-purple-500/25 group-hover:scale-110 transition-transform">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">
+              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+              Delta-E &lt; 1.5
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium font-mono">ISO 12647-2</span>
+          </div>
+        </motion.div>
+      </div>
+
       {/* 08:00 AM Client Reminders & Approvals Panel */}
       <ClientFollowUpPanel jobs={jobs} onSaveNotification={onSaveNotification} />
 
@@ -449,7 +575,7 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
 
             {/* Category Filter Pills */}
             <div className="flex items-center bg-slate-100/90 border border-slate-200 p-0.5 rounded-xl text-xs font-bold text-slate-700">
-              {['All', 'Updates', 'Proofs', 'QC & Accounts', 'Dispatch'].map((cat) => (
+              {['All', 'Auto Cron', 'Updates', 'Proofs', 'QC & Accounts', 'Dispatch'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategoryFilter(cat)}
@@ -531,7 +657,7 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
                 {/* Right side timestamp & Quick action hint */}
                 <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center w-full sm:w-auto text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
                   <span className="text-[11px] font-mono font-bold text-slate-400">
-                    {formatDistanceToNow(new Date(act.timestamp), { addSuffix: true })}
+                    {getSafeTimestampDisplay(act.timestamp)}
                   </span>
                   <span className="text-[11px] font-bold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity flex items-center mt-1">
                     Inspect <ArrowRight className="w-3 h-3 ml-0.5" />

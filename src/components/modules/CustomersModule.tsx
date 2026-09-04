@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { Customer } from '../../types';
 import { EmailLink } from '../EmailLink';
+import { ClientEmailSendButton } from '../ClientEmailSendButton';
+import { ClientEmailLogsCard } from '../ClientEmailLogsCard';
 
 interface CustomersModuleProps {
   customers: Customer[];
@@ -309,7 +311,7 @@ export const CustomersModule: React.FC<CustomersModuleProps> = ({
 
         {/* Selected Customer Detailed Profile Card */}
         <div className="lg:col-span-5 mirror-card bg-zinc-900/90 rounded-xl border border-zinc-800/80 shadow-xl p-5 space-y-4">
-          <div className="border-b border-zinc-800 pb-3 flex justify-between items-start">
+          <div className="border-b border-zinc-800 pb-3 flex flex-wrap justify-between items-start gap-2">
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded">
@@ -322,14 +324,26 @@ export const CustomersModule: React.FC<CustomersModuleProps> = ({
               <h3 className="text-base font-extrabold text-zinc-100 mt-1">{selectedCustomer.company}</h3>
             </div>
 
-            <button
-              type="button"
-              onClick={() => openEditModal()}
-              className="px-3 py-1.5 bg-zinc-800 hover:bg-amber-500 hover:text-zinc-950 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer"
-            >
-              <Pencil className="w-3.5 h-3.5" />
-              <span>Edit Account</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <ClientEmailSendButton
+                toEmail={selectedCustomer.email}
+                clientName={selectedCustomer.contactPerson || selectedCustomer.name}
+                companyName={selectedCustomer.company}
+                clientId={selectedCustomer.id}
+                label="Re-Send Email to Client"
+                variant="emerald"
+                onSaveNotification={onSaveNotification}
+              />
+
+              <button
+                type="button"
+                onClick={() => openEditModal()}
+                className="px-3 py-1.5 bg-zinc-800 hover:bg-amber-500 hover:text-zinc-950 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                <span>Edit</span>
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3 text-xs">
@@ -394,6 +408,18 @@ export const CustomersModule: React.FC<CustomersModuleProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Selected Customer Database Email Logs & Communication History */}
+      {selectedCustomer && (
+        <ClientEmailLogsCard
+          clientId={selectedCustomer.id}
+          clientName={selectedCustomer.contactPerson || selectedCustomer.name}
+          companyName={selectedCustomer.company}
+          clientEmail={selectedCustomer.email}
+          title={`Database Communication & Email Logs — ${selectedCustomer.company} (${selectedCustomer.code})`}
+          onSaveNotification={onSaveNotification}
+        />
+      )}
 
       {/* Add New Customer Modal */}
       {isModalOpen && (

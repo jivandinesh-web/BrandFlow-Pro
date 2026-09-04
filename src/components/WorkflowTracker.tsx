@@ -40,12 +40,12 @@ export const WorkflowTracker: React.FC<WorkflowTrackerProps> = ({
             <React.Fragment key={s.stage}>
               <button
                 onClick={() => onNavigateToModule(s.module)}
-                className={`flex items-center text-xs font-bold transition-all cursor-pointer px-3 py-1.5 rounded-xl ${
+                className={`flex items-center text-xs font-bold transition-all duration-200 cursor-pointer px-3 py-1.5 rounded-xl active:scale-95 ${
                   isCurrent
-                    ? 'text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 shadow-md shadow-indigo-500/20'
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md shadow-indigo-500/25 text-white border border-white/20'
                     : isCompleted
-                    ? 'text-indigo-600 bg-indigo-50/70 hover:bg-indigo-100/70 border border-indigo-200/60'
-                    : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100/80'
+                    ? 'text-indigo-700 bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200/80'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/90'
                 }`}
               >
                 <div

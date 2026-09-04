@@ -1,36 +1,113 @@
-import React from 'react';
-import { Users, ShieldCheck, Lock, CheckCircle2, XCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Users, ShieldCheck, Lock, CheckCircle2, XCircle, Edit3, Printer, Save, AlertTriangle } from 'lucide-react';
 import { SYSTEM_USERS } from '../../data/mockData';
 import { UserRole } from '../../types';
 import { EmailLink } from '../EmailLink';
+import { PrintModal } from '../PrintModal';
 
 interface UserManagementModuleProps {
   currentRole: UserRole;
   onSaveNotification: (msg: string) => void;
+  isEditing?: boolean;
+  setIsEditing?: (editing: boolean) => void;
 }
 
 export const UserManagementModule: React.FC<UserManagementModuleProps> = ({
   currentRole,
   onSaveNotification,
+  isEditing = false,
+  setIsEditing,
 }) => {
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const isAdmin = currentRole === 'Admin';
+
+  const handleToggleEditMode = () => {
+    if (!isAdmin) {
+      onSaveNotification('Access Denied: Master Edit Mode is restricted to Administrator role.');
+      return;
+    }
+    if (setIsEditing) {
+      const nextState = !isEditing;
+      setIsEditing(nextState);
+      onSaveNotification(
+        nextState
+          ? 'Master Edit Mode ENABLED across all production records.'
+          : 'Master Edit Mode DISABLED. Records set to Read-Only.'
+      );
+    }
+  };
+
+  const handleSavePolicies = () => {
+    if (!isAdmin) {
+      onSaveNotification('Access Denied: Saving system policies requires Administrator role.');
+      return;
+    }
+    if (setIsEditing && isEditing) {
+      setIsEditing(false);
+    }
+    onSaveNotification('Administrator save completed: All system security policies, permissions & batch states synchronized.');
+  };
+
   return (
     <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-zinc-950 min-h-full">
-      <div className="mirror-card p-4 sm:p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/90 shadow-xl flex flex-wrap justify-between items-center gap-3">
+      {/* Top Admin Operations & Master Action Bar */}
+      <div className="mirror-card p-4 sm:p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/90 shadow-xl flex flex-wrap justify-between items-center gap-4">
         <div>
           <div className="flex items-center space-x-2 text-xs font-bold text-amber-400">
             <Users className="w-4 h-4 text-amber-400" />
-            <span>User Management & Security Access Control</span>
+            <span>Admin Control Panel & Security Access</span>
           </div>
-          <h2 className="text-base sm:text-lg font-extrabold text-zinc-100 mt-0.5">Role-Based Rights & Department Permissions</h2>
+          <h2 className="text-base sm:text-lg font-extrabold text-zinc-100 mt-0.5">Role-Based Rights & Master Controls</h2>
+          <p className="text-xs text-zinc-400 mt-0.5">
+            System-level editing rights, printable audit reports, and batch synchronization are managed here.
+          </p>
         </div>
 
-        <button
-          onClick={() => onSaveNotification('Security permission policies updated.')}
-          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-lg text-xs font-black shadow-md shadow-amber-500/20 cursor-pointer transition-all border border-amber-300/30"
-        >
-          <span>Save Permission Policies</span>
-        </button>
+        {/* Restricted Admin Controls: Edit, Print, Save */}
+        <div className="flex items-center flex-wrap gap-2.5">
+          {/* Master Edit Mode Toggle */}
+          <button
+            onClick={handleToggleEditMode}
+            className={`px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-md ${
+              isEditing
+                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 shadow-amber-500/20 border border-amber-300'
+                : 'bg-zinc-800/90 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 hover:border-amber-500/50'
+            }`}
+            title="Toggle Master Edit Mode (Admin Only)"
+          >
+            <Edit3 className={`w-3.5 h-3.5 ${isEditing ? 'text-zinc-950' : 'text-amber-400'}`} />
+            <span>{isEditing ? 'Master Edit: ACTIVE' : 'Enable Master Edit'}</span>
+          </button>
+
+          {/* Print Audit Report */}
+          <button
+            onClick={() => setShowPrintModal(true)}
+            className="px-3.5 py-2 bg-zinc-800/90 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 hover:border-zinc-600 rounded-lg text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-md"
+            title="Print System Audit & Permission Matrix Report"
+          >
+            <Printer className="w-3.5 h-3.5 text-zinc-400" />
+            <span>Print Audit Report</span>
+          </button>
+
+          {/* Master Save Button */}
+          <button
+            onClick={handleSavePolicies}
+            className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-lg text-xs font-black shadow-md shadow-amber-500/20 cursor-pointer flex items-center gap-2 transition-all border border-amber-300/30"
+          >
+            <Save className="w-3.5 h-3.5 text-zinc-950" />
+            <span>Master Save</span>
+          </button>
+        </div>
       </div>
+
+      {!isAdmin && (
+        <div className="p-3.5 bg-rose-950/40 border border-rose-800/60 rounded-xl flex items-center space-x-3 text-xs text-rose-200">
+          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+          <span>
+            You are currently viewing with <strong>{currentRole}</strong> role. Switch role to <strong>Admin</strong> in the top-right menu to exercise full administrative control privileges.
+          </span>
+        </div>
+      )}
 
       {/* Permission Rights Matrix Card */}
       <div className="mirror-card bg-zinc-900/90 rounded-xl border border-zinc-800/80 shadow-xl p-5 space-y-4">
@@ -157,6 +234,14 @@ export const UserManagementModule: React.FC<UserManagementModuleProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Print Audit Modal */}
+      <PrintModal
+        isOpen={showPrintModal}
+        onClose={() => setShowPrintModal(false)}
+        documentTitle="BrandFlow Security Matrix & Admin Audit Report"
+        departmentName="Admin Security & Permissions"
+      />
     </div>
   );
 };

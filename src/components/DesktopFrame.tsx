@@ -33,6 +33,8 @@ import {
   List,
 } from 'lucide-react';
 import { ModuleType, UserRole } from '../types';
+import { CookieConsent } from './CookieConsent';
+import { LegalFooter } from './LegalFooter';
 
 interface DesktopFrameProps {
   children: React.ReactNode;
@@ -136,13 +138,13 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
   return (
     <div className="h-screen w-screen bg-slate-50 text-slate-800 font-sans flex flex-col overflow-hidden select-none bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]">
       {/* Top Application Window Bar with Vibrant Gradient & Mirror Glass Finish */}
-      <div className="bg-white/75 backdrop-blur-xl border-b border-slate-200/80 px-4 py-2 flex items-center justify-between text-xs text-slate-600 shrink-0 shadow-xs relative z-30 specular-border">
+      <div className="charcoal-glass backdrop-blur-xl border-b border-slate-700/80 px-4 py-2 flex items-center justify-between text-xs text-slate-300 shrink-0 shadow-xs relative z-30 specular-border">
         <div className="flex items-center space-x-3">
           {/* Mobile Drawer Hamburger Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation drawer menu"
-            className="md:hidden p-1.5 bg-white/80 hover:bg-slate-100 text-indigo-600 border border-slate-200 rounded-md focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition-colors shadow-2xs"
+            className="md:hidden p-1.5 bg-slate-800/80 hover:bg-slate-700 text-indigo-400 border border-slate-700 rounded-md focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition-colors shadow-2xs"
           >
             <Menu className="w-4 h-4" />
           </button>
@@ -172,12 +174,12 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
           <div
             className={`px-3.5 py-1 rounded-full text-xs font-bold flex items-center space-x-2 animate-in fade-in transition-all shadow-md backdrop-blur-md ${
               notificationMsg.includes('QUOTATION')
-                ? 'bg-amber-50 text-amber-900 border border-amber-300 shadow-amber-500/10'
+                ? 'bg-amber-900/20 text-amber-100 border border-amber-700 shadow-amber-900/10'
                 : notificationMsg.includes('ARTWORK')
-                ? 'bg-purple-50 text-purple-900 border border-purple-300 shadow-purple-500/10'
+                ? 'bg-purple-900/20 text-purple-100 border border-purple-700 shadow-purple-900/10'
                 : notificationMsg.includes('Dispatch') || notificationMsg.includes('DISPATCH')
-                ? 'bg-emerald-50 text-emerald-900 border border-emerald-300 shadow-emerald-500/10'
-                : 'bg-white/90 text-indigo-950 border border-indigo-200 shadow-indigo-500/10'
+                ? 'bg-emerald-900/20 text-emerald-100 border border-emerald-700 shadow-emerald-900/10'
+                : 'bg-slate-800/90 text-indigo-100 border border-slate-700 shadow-indigo-900/10'
             }`}
           >
             <span
@@ -245,7 +247,7 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
 
         {/* Left Technical Navigation Bar with Glass Mirror Finish */}
         <nav
-          className={`fixed md:relative inset-y-0 left-0 z-50 bg-white/80 backdrop-blur-xl border-r border-slate-200/90 flex flex-col justify-between shrink-0 overflow-y-auto scrollbar-thin transition-all duration-300 ease-in-out shadow-xs ${
+          className={`fixed md:relative inset-y-0 left-0 z-50 charcoal-glass border-r border-slate-700/90 flex flex-col justify-between shrink-0 overflow-y-auto scrollbar-thin transition-all duration-300 ease-in-out shadow-xs ${
             mobileMenuOpen
               ? 'translate-x-0 w-80'
               : `-translate-x-full md:translate-x-0 ${
@@ -377,11 +379,11 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
                             } text-xs font-semibold ${
                               isActive
                                 ? isGridMode
-                                  ? 'bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-300 text-indigo-900 shadow-xs'
-                                  : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-md shadow-indigo-500/20 font-bold'
+                                  ? 'bg-gradient-to-r from-indigo-600/15 to-purple-600/15 border-indigo-400 text-indigo-900 shadow-xs font-bold'
+                                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/25 font-bold border border-white/20'
                                 : isGridMode
-                                ? 'bg-white/80 border-slate-200/80 text-slate-600 hover:bg-white hover:text-indigo-600 hover:border-indigo-200'
-                                : 'text-slate-600 hover:bg-indigo-50/80 hover:text-indigo-600'
+                                ? 'bg-white/80 border-slate-200/80 text-slate-700 hover:bg-white hover:text-indigo-600 hover:border-indigo-200 active:scale-95'
+                                : 'text-slate-700 hover:bg-indigo-50/80 hover:text-indigo-600 active:scale-95'
                             }`}
                           >
                             <div
@@ -410,12 +412,16 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
 
                               {(!isSidebarCollapsed || mobileMenuOpen) && item.badge && (
                                 <span
-                                  className={`px-1.5 py-0.5 rounded text-[9px] font-bold font-mono shrink-0 shadow-2xs ${
+                                  className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold font-mono shrink-0 shadow-2xs ${
                                     isActive
                                       ? isGridMode
                                         ? 'bg-indigo-600 text-white'
                                         : 'bg-white/25 text-white border border-white/40'
-                                      : 'bg-indigo-50 text-indigo-600 border border-indigo-200/60'
+                                      : item.badge.includes('PROD') || item.badge.includes('ACTIVE') || item.badge === '5'
+                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                      : item.badge.includes('URGENT') || item.badge.includes('FAIL')
+                                      ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                      : 'bg-indigo-50 text-indigo-700 border border-indigo-200/70'
                                   }`}
                                 >
                                   {item.badge}
@@ -495,16 +501,8 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
         </div>
       </div>
 
-      {/* Footer Status Bar with Mirror Glass Light */}
-      <footer className="h-8 bg-white/80 backdrop-blur-md border-t border-slate-200/80 text-slate-500 text-[10px] px-4 sm:px-6 flex items-center justify-between font-mono shrink-0 shadow-2xs">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5 text-slate-700 font-medium font-sans">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50 animate-pulse" />
-            System Live & Connected
-          </span>
-          <span className="hidden sm:inline">User: Admin (Arthur)</span>
-          <span className="hidden md:inline text-slate-400">Host: BF-MIRROR-GLASS-01</span>
-        </div>
+      <footer className="bg-white/80 backdrop-blur-md border-t border-slate-200/80 text-slate-500 text-[10px] px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between font-mono shrink-0 shadow-2xs py-2 gap-2">
+        <LegalFooter />
         <div className="flex items-center gap-4 uppercase font-bold">
           <span className="hidden sm:inline text-slate-400 font-mono">ERP v4.8</span>
           <span className="text-indigo-600 flex items-center gap-1.5 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200/80">
@@ -513,6 +511,7 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
           </span>
         </div>
       </footer>
+      <CookieConsent />
 
       {/* Guided Quick-Start Tour Modal */}
       {showOnboarding && (
