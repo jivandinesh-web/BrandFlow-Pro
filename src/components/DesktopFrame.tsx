@@ -56,7 +56,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { id: 'Customers', label: 'Customers', icon: Users, badge: '5' },
       { id: 'Quotations', label: 'Quotations', icon: Calculator, badge: '4' },
-      { id: 'Production', label: 'Production', icon: Printer, badge: '3 Runs' },
+      { id: 'Production', label: 'Production', icon: Printer, badge: '3' },
       { id: 'QualityControl', label: 'Quality Control', icon: Award },
       { id: 'Dispatch', label: 'Dispatch', icon: Truck, badge: 'Live' },
     ],
@@ -261,11 +261,11 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
         >
           <div className="py-2 space-y-3">
             {/* Sidebar Toggle & Header Control with Responsive Grid Switcher */}
-            <div className="px-3.5 py-2 flex items-center justify-between border-b border-slate-200/70">
+            <div className="px-3.5 py-2 flex items-center justify-between border-b border-slate-700/80">
               {!isSidebarCollapsed || mobileMenuOpen ? (
                 <div className="flex items-center justify-between w-full">
-                  <span className="font-bold text-xs uppercase tracking-wider text-indigo-600 flex items-center gap-2">
-                    <LayoutDashboard className="w-3.5 h-3.5 text-indigo-600" />
+                  <span className="font-bold text-xs uppercase tracking-wider text-indigo-300 flex items-center gap-2">
+                    <LayoutDashboard className="w-3.5 h-3.5 text-indigo-400" />
                     <span>Modules Navigation</span>
                   </span>
                   <div className="flex items-center gap-1">
@@ -274,7 +274,7 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
                       onClick={() =>
                         setSidebarLayoutMode(sidebarLayoutMode === 'list' ? 'grid' : 'list')
                       }
-                      className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                      className="p-1 text-slate-300 hover:text-white hover:bg-slate-700/60 rounded-md transition-colors"
                       title={
                         sidebarLayoutMode === 'list'
                           ? 'Switch to 2-Column Responsive Grid'
@@ -292,7 +292,7 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
                     {/* Desktop Expand / Collapse Sidebar Toggle */}
                     <button
                       onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                      className="hidden md:flex p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                      className="hidden md:flex p-1 text-slate-300 hover:text-white hover:bg-slate-700/60 rounded-md transition-colors"
                       title={isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar to Icon Rail'}
                       aria-label="Toggle sidebar expansion"
                     >
@@ -301,7 +301,7 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
                     {/* Mobile Close Button */}
                     <button
                       onClick={() => setMobileMenuOpen(false)}
-                      className="md:hidden p-1 text-slate-400 hover:text-slate-700 rounded-md"
+                      className="md:hidden p-1 text-slate-300 hover:text-white rounded-md"
                       aria-label="Close mobile navigation"
                     >
                       <X className="w-4 h-4" />
@@ -312,11 +312,11 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
                 <div className="w-full flex justify-center">
                   <button
                     onClick={() => setIsSidebarCollapsed(false)}
-                    className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                    className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700/60 rounded-md transition-colors"
                     title="Expand Sidebar"
                     aria-label="Expand sidebar"
                   >
-                    <PanelLeftOpen className="w-4 h-4 text-indigo-600" />
+                    <PanelLeftOpen className="w-4 h-4 text-indigo-400" />
                   </button>
                 </div>
               )}
@@ -330,7 +330,7 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
                   {(!isSidebarCollapsed || mobileMenuOpen) && (
                     <div
                       onClick={() => toggleCategory(group.category)}
-                      className="flex items-center justify-between px-4 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest cursor-pointer hover:text-indigo-600 transition-colors"
+                      className="flex items-center justify-between px-4 py-1.5 text-[10px] font-bold text-slate-300 uppercase tracking-widest cursor-pointer hover:text-white transition-colors"
                     >
                       <span>{group.category}</span>
                       {isCollapsed ? (
@@ -344,7 +344,7 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
                   {/* Category Separator in Compact Rail Mode */}
                   {isSidebarCollapsed && !mobileMenuOpen && (
                     <div className="px-2 py-1">
-                      <div className="w-full h-px bg-slate-200 my-1" />
+                      <div className="w-full h-px bg-slate-700/80 my-1" />
                     </div>
                   )}
 
@@ -379,11 +379,11 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
                             } text-xs font-semibold ${
                               isActive
                                 ? isGridMode
-                                  ? 'bg-gradient-to-r from-indigo-600/15 to-purple-600/15 border-indigo-400 text-indigo-900 shadow-xs font-bold'
-                                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/25 font-bold border border-white/20'
+                                  ? 'bg-gradient-to-r from-indigo-500/25 to-purple-500/25 border-indigo-400/80 text-white shadow-xs font-bold'
+                                  : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/30 font-bold border border-white/30'
                                 : isGridMode
-                                ? 'bg-white/80 border-slate-200/80 text-slate-700 hover:bg-white hover:text-indigo-600 hover:border-indigo-200 active:scale-95'
-                                : 'text-slate-700 hover:bg-indigo-50/80 hover:text-indigo-600 active:scale-95'
+                                ? 'bg-slate-800/80 border-slate-700/80 text-slate-100 hover:bg-slate-700/90 hover:text-white hover:border-indigo-400/50 active:scale-95'
+                                : 'text-slate-100 hover:bg-white/10 hover:text-white active:scale-95'
                             }`}
                           >
                             <div
@@ -393,35 +393,33 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
                                   : 'flex items-center space-x-2.5 truncate'
                               }
                             >
-                              <div className="flex items-center space-x-2 truncate">
+                              <div className="flex items-center space-x-2.5 truncate">
                                 <Icon
                                   className={`shrink-0 transition-transform group-hover:scale-110 ${
                                     isGridMode ? 'w-4 h-4' : 'w-4 h-4'
                                   } ${
                                     isActive
-                                      ? isGridMode
-                                        ? 'text-indigo-600'
-                                        : 'text-white'
-                                      : 'text-slate-400 group-hover:text-indigo-600'
+                                      ? 'text-white'
+                                      : 'text-slate-200 group-hover:text-white'
                                   }`}
                                 />
                                 {!isGridMode && (!isSidebarCollapsed || mobileMenuOpen) && (
-                                  <span className="truncate">{item.label}</span>
+                                  <span className="truncate font-medium text-[13px] tracking-tight text-slate-100 group-hover:text-white">{item.label}</span>
                                 )}
                               </div>
 
                               {(!isSidebarCollapsed || mobileMenuOpen) && item.badge && (
                                 <span
-                                  className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold font-mono shrink-0 shadow-2xs ${
+                                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-mono shrink-0 shadow-xs ${
                                     isActive
                                       ? isGridMode
-                                        ? 'bg-indigo-600 text-white'
-                                        : 'bg-white/25 text-white border border-white/40'
+                                        ? 'bg-indigo-500 text-white'
+                                        : 'bg-white/30 text-white border border-white/50'
                                       : item.badge.includes('PROD') || item.badge.includes('ACTIVE') || item.badge === '5'
-                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                      ? 'bg-emerald-100 text-emerald-950 border border-emerald-300'
                                       : item.badge.includes('URGENT') || item.badge.includes('FAIL')
-                                      ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                                      : 'bg-indigo-50 text-indigo-700 border border-indigo-200/70'
+                                      ? 'bg-rose-100 text-rose-950 border border-rose-300'
+                                      : 'bg-indigo-100 text-indigo-950 border border-indigo-300'
                                   }`}
                                 >
                                   {item.badge}
@@ -430,14 +428,14 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
                             </div>
 
                             {isGridMode && (!isSidebarCollapsed || mobileMenuOpen) && (
-                              <span className={`text-[11px] leading-tight truncate w-full mt-1 font-medium ${isActive ? 'text-indigo-950 font-bold' : 'text-slate-600 group-hover:text-indigo-900'}`}>
+                              <span className={`text-[11px] leading-tight truncate w-full mt-1 font-medium ${isActive ? 'text-white font-bold' : 'text-slate-100 group-hover:text-white'}`}>
                                 {item.label}
                               </span>
                             )}
 
                             {/* Floating Tooltip in Compact Rail Mode */}
                             {isSidebarCollapsed && !mobileMenuOpen && (
-                              <div className="absolute left-full ml-2.5 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-md border border-slate-800 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                              <div className="absolute left-full ml-2.5 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold rounded-md border border-slate-700 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
                                 <span>{item.label}</span>
                                 {item.badge && (
                                   <span className="ml-1.5 px-1 py-0.2 bg-indigo-500 text-white rounded text-[9px]">
@@ -457,17 +455,17 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
           </div>
 
           {/* Bottom Profile Footer */}
-          <div className="p-3 bg-white/90 border-t border-slate-200/80">
+          <div className="p-3 bg-slate-800/80 backdrop-blur-md border-t border-slate-700/80">
             {(!isSidebarCollapsed || mobileMenuOpen) ? (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center font-black text-white text-xs border border-white/60 shadow-xs shrink-0">
                     {currentRole[0]}
                   </div>
-                  <div className="text-xs text-slate-700 truncate">
-                    <p className="font-bold text-slate-900 truncate">Arthur Pendelton</p>
-                    <p className="text-[10px] text-indigo-600 font-semibold flex items-center gap-1 mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="text-xs text-slate-200 truncate">
+                    <p className="font-bold text-white truncate">Arthur Pendelton</p>
+                    <p className="text-[10px] text-indigo-300 font-semibold flex items-center gap-1 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       <span>{currentRole}</span>
                     </p>
                   </div>
@@ -475,7 +473,7 @@ export const DesktopFrame: React.FC<DesktopFrameProps> = ({
 
                 <button
                   onClick={() => setIsSidebarCollapsed(true)}
-                  className="hidden md:flex p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                  className="hidden md:flex p-1.5 text-slate-300 hover:text-white hover:bg-slate-700/60 rounded-lg transition-colors"
                   title="Collapse Sidebar"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
