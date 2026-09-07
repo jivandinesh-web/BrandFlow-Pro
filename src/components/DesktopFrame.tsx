@@ -53,7 +53,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     category: 'Operational',
     items: [
-      { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { id: 'Dashboard', label: 'QUEUE', icon: LayoutDashboard },
       { id: 'Customers', label: 'Customers', icon: Users, badge: '5' },
       { id: 'Quotations', label: 'Quotations', icon: Calculator, badge: '4' },
       { id: 'Production', label: 'Production', icon: Printer, badge: '3' },

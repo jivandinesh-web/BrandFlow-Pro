@@ -17,7 +17,7 @@ interface ToolbarHeaderProps {
 }
 
 const MODULE_NAMES: Record<ModuleType, string> = {
-  Dashboard: 'Production Queue',
+  Dashboard: 'QUEUE',
   Customers: 'Client Accounts & CRM',
   Quotations: 'Print Quotations & Estimating',
   ClientQuote: 'Client Quotation Review',
