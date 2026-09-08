@@ -132,6 +132,7 @@ export const INITIAL_JOBS: Job[] = [
         previewUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&q=80',
       },
     ],
+    customBrandingNotes: 'Metallic gold foil match to Pantone 871C. Crisp 0.2mm edge registration on outside front cover.',
     quote: {
       id: 'QT-9901',
       quoteNumber: 'QUO-2026-8941',
@@ -157,6 +158,7 @@ export const INITIAL_JOBS: Job[] = [
           maxPhysicalWidthMm: 210,
           maxPhysicalHeightMm: 297,
           brandingMethod: 'Hot Stamped Gold Foil Stamping',
+          customBrandingNotes: 'Metallic gold foil match to Pantone 871C. Crisp 0.2mm edge registration on outside front cover.',
         },
         {
           description: 'Die Tooling Setup & Hot Foil Stamping Block Manufacture',
@@ -306,6 +308,7 @@ export const INITIAL_JOBS: Job[] = [
         previewUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80',
       },
     ],
+    customBrandingNotes: '3mm EVA foam backing for raised 3D effect. High stitch density with metallic gold polyester Madeira thread.',
     quote: {
       id: 'QT-9902',
       quoteNumber: 'QUO-2026-8942',
@@ -331,6 +334,7 @@ export const INITIAL_JOBS: Job[] = [
           maxPhysicalWidthMm: 140,
           maxPhysicalHeightMm: 140,
           brandingMethod: '3D Foam Thread Embroidery',
+          customBrandingNotes: '3mm EVA foam backing for raised 3D effect. High stitch density with metallic gold polyester Madeira thread.',
         },
       ],
       subtotal: 132000,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, CheckCircle2, AlertOctagon, ArrowRight, Award, Eye } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, AlertOctagon, ArrowRight, Award, Eye, Edit3 } from 'lucide-react';
 import { Job, QualityControlCheck } from '../../types';
 
 interface QualityControlModuleProps {
@@ -38,7 +38,7 @@ export const QualityControlModule: React.FC<QualityControlModuleProps> = ({
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-zinc-950 min-h-full">
+    <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-transparent min-h-full">
       {/* Header */}
       <div className="mirror-card p-4 sm:p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/90 shadow-xl flex flex-wrap justify-between items-center gap-3">
         <div>
@@ -64,6 +64,19 @@ export const QualityControlModule: React.FC<QualityControlModuleProps> = ({
           <h3 className="text-xs font-bold uppercase text-zinc-300 border-b border-zinc-800 pb-2">
             Print Quality Measurement Checkpoints
           </h3>
+
+          {/* Custom Branding Verification Card */}
+          {(job.customBrandingNotes || job.quote?.items?.find((i) => i.customBrandingNotes)?.customBrandingNotes) && (
+            <div className="p-3.5 bg-amber-500/10 border border-amber-400/30 rounded-lg text-xs space-y-1">
+              <div className="flex items-center space-x-1.5 text-amber-300 font-bold text-[11px] uppercase tracking-wide">
+                <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                <span>Custom Branding Specification to Verify</span>
+              </div>
+              <p className="text-zinc-200 font-medium leading-relaxed">
+                {job.customBrandingNotes || job.quote?.items?.find((i) => i.customBrandingNotes)?.customBrandingNotes}
+              </p>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
             <div className="p-3 bg-zinc-950/70 border border-emerald-500/40 rounded-lg">

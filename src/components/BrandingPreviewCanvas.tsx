@@ -25,6 +25,8 @@ import {
   Minimize2,
   ZoomIn,
   Info,
+  ChevronDown,
+  Edit3,
 } from 'lucide-react';
 import { BrandingMethodDetailModal } from './modals/BrandingMethodDetailModal';
 import { BrandingMethodDetail } from '../data/brandingMethodsData';
@@ -44,6 +46,7 @@ export interface BrandingInteractiveState {
   secondaryColor: string;
   showGrid: boolean;
   showPressLimit: boolean;
+  customBrandingNotes?: string;
 }
 
 export interface BrandingPreviewCanvasProps {
@@ -55,6 +58,7 @@ export interface BrandingPreviewCanvasProps {
   maxPhysicalWidthMm: number;
   maxPhysicalHeightMm: number;
   brandingMethod?: string;
+  customBrandingNotes?: string;
   compact?: boolean;
   interactive?: boolean;
   onUpdatePlacement?: (
@@ -63,8 +67,10 @@ export interface BrandingPreviewCanvasProps {
     heightMm: number,
     method?: string,
     posX?: number,
-    posY?: number
+    posY?: number,
+    customNotes?: string
   ) => void;
+  onUpdateCustomNotes?: (notes: string) => void;
   onChange?: (state: BrandingInteractiveState) => void;
 }
 
@@ -230,6 +236,7 @@ export const PLACEMENT_PRESETS = [
   { name: 'Front Cover Center', x: 50, y: 46, desc: 'Cover Center' },
   { name: 'Bottom Right Corner', x: 70, y: 72, desc: 'Corner Stamp' },
   { name: 'Cap Front Panel', x: 50, y: 55, desc: 'Headwear Brim' },
+  { name: 'Custom Branding', x: 50, y: 50, desc: 'Custom Specification & Notes' },
 ];
 
 // Color Swatches
@@ -254,9 +261,11 @@ export const BrandingPreviewCanvas: React.FC<BrandingPreviewCanvasProps> = ({
   maxPhysicalWidthMm = 300,
   maxPhysicalHeightMm = 400,
   brandingMethod = '3-Color Screen Printing',
+  customBrandingNotes = '',
   compact = false,
   interactive = true,
   onUpdatePlacement,
+  onUpdateCustomNotes,
   onChange,
 }) => {
   // Parse initial coordinates based on placement name
@@ -270,6 +279,7 @@ export const BrandingPreviewCanvas: React.FC<BrandingPreviewCanvasProps> = ({
     if (p.includes('spine') || p.includes('edge')) return { x: 20, y: 50 };
     if (p.includes('top header') || p.includes('brim') || p.includes('hood') || p.includes('cap')) return { x: 50, y: 52 };
     if (p.includes('sign') || p.includes('correx') || p.includes('plaque')) return { x: 50, y: 50 };
+    if (p.includes('custom')) return { x: 50, y: 50 };
     return { x: 50, y: 50 };
   };
 
@@ -284,6 +294,7 @@ export const BrandingPreviewCanvas: React.FC<BrandingPreviewCanvasProps> = ({
   const [aspectLocked, setAspectLocked] = useState<boolean>(true);
   const [activePlacementName, setActivePlacementName] = useState<string>(brandingPlacement);
   const [activeTechnique, setActiveTechnique] = useState<string>(brandingMethod);
+  const [customNotes, setCustomNotes] = useState<string>(customBrandingNotes || '');
   const [graphicType, setGraphicType] = useState<'logo' | 'text' | 'crest' | 'sign' | 'patch'>('logo');
   const [customText, setCustomText] = useState<string>('BRANDFLOW');
   const [customSubtext, setCustomSubtext] = useState<string>('STUDIO DESIGN');
@@ -326,7 +337,10 @@ export const BrandingPreviewCanvas: React.FC<BrandingPreviewCanvasProps> = ({
     if (imageUrl && imageUrl !== currentMockupUrl) {
       setCurrentMockupUrl(imageUrl);
     }
-  }, [brandingWidthMm, brandingHeightMm, brandingPlacement, brandingMethod, imageUrl]);
+    if (customBrandingNotes !== undefined) {
+      setCustomNotes(customBrandingNotes);
+    }
+  }, [brandingWidthMm, brandingHeightMm, brandingPlacement, brandingMethod, imageUrl, customBrandingNotes]);
 
   // Machine physical limit validation
   const effectiveMaxWidth = maxPhysicalWidthMm || 300;
@@ -337,9 +351,10 @@ export const BrandingPreviewCanvas: React.FC<BrandingPreviewCanvasProps> = ({
 
   // Inform parent of updates
   const notifyParent = useCallback(
-    (newPlacement: string, newW: number, newH: number, newMethod: string, newX: number, newY: number) => {
+    (newPlacement: string, newW: number, newH: number, newMethod: string, newX: number, newY: number, newNotes?: string) => {
+      const currentNotesToSave = newNotes !== undefined ? newNotes : customNotes;
       if (onUpdatePlacement) {
-        onUpdatePlacement(newPlacement, newW, newH, newMethod, newX, newY);
+        onUpdatePlacement(newPlacement, newW, newH, newMethod, newX, newY, currentNotesToSave);
       }
       if (onChange) {
         onChange({
@@ -356,10 +371,11 @@ export const BrandingPreviewCanvas: React.FC<BrandingPreviewCanvasProps> = ({
           secondaryColor: '#ffffff',
           showGrid,
           showPressLimit,
+          customBrandingNotes: currentNotesToSave,
         });
       }
     },
-    [onUpdatePlacement, onChange, rotation, graphicType, customText, primaryColor, showGrid, showPressLimit]
+    [onUpdatePlacement, onChange, rotation, graphicType, customText, primaryColor, showGrid, showPressLimit, customNotes]
   );
 
   // Direct Drag Handler on Physical Stage
@@ -914,42 +930,99 @@ export const BrandingPreviewCanvas: React.FC<BrandingPreviewCanvasProps> = ({
       </div>
 
       {/* 4. Placement Presets & Quick Alignment Toolbar */}
-      <div className="space-y-2">
-        <div className="flex justify-between items-center text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-          <span className="flex items-center space-x-1">
+      <div className="space-y-2.5">
+        <div className="flex items-center text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+          <span className="flex items-center space-x-1.5">
             <MapPin className="w-3.5 h-3.5 text-amber-400" />
             <span>Preset Placement Locations & Auto-Alignment</span>
           </span>
-          <span className="text-amber-300 font-mono font-bold">
-            Current: {activePlacementName}
-          </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {PLACEMENT_PRESETS.map((preset, pIdx) => {
-            const isSelected = activePlacementName === preset.name;
-            return (
-              <button
-                key={pIdx}
-                type="button"
-                onClick={() => applyPresetPlacement(preset)}
-                className={`p-2 rounded-xl border text-left text-xs transition-all cursor-pointer flex flex-col justify-between ${
-                  isSelected
-                    ? 'bg-amber-500/20 border-amber-400 text-amber-200 ring-1 ring-amber-400/50 shadow-md'
-                    : 'bg-zinc-950/70 border-zinc-800/80 text-zinc-300 hover:bg-zinc-800/80 hover:border-zinc-700'
-                }`}
-              >
-                <div className="font-extrabold truncate">{preset.name}</div>
-                <div className="text-[9px] text-zinc-400 flex justify-between items-center mt-1">
-                  <span>{preset.desc}</span>
-                  <span className="font-mono text-[9px] text-amber-400/80">
-                    {preset.x}%, {preset.y}%
-                  </span>
-                </div>
-              </button>
-            );
-          })}
+        {/* Dropdown Selector with Coordinates immediately following */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
+          <div className="relative flex-1">
+            <select
+              id="preset-placement-select"
+              value={activePlacementName}
+              onChange={(e) => {
+                const selected = PLACEMENT_PRESETS.find((p) => p.name === e.target.value);
+                if (selected) {
+                  applyPresetPlacement(selected);
+                } else {
+                  setActivePlacementName(e.target.value);
+                }
+              }}
+              className="w-full pl-3.5 pr-10 py-2.5 bg-zinc-950/80 hover:bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-100 rounded-xl text-xs font-semibold tracking-wide appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-400/60 focus:border-amber-400 transition-all shadow-inner"
+            >
+              {PLACEMENT_PRESETS.map((preset, pIdx) => (
+                <option key={pIdx} value={preset.name} className="bg-zinc-900 text-zinc-100 py-1.5">
+                  {preset.name} ({preset.desc})
+                </option>
+              ))}
+              {!PLACEMENT_PRESETS.some((p) => p.name === activePlacementName) && (
+                <option value={activePlacementName} className="bg-zinc-900 text-amber-300 py-1.5">
+                  {activePlacementName} (Custom Position)
+                </option>
+              )}
+            </select>
+            <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* Coordinates moved after the dropdown selection */}
+          <div
+            id="placement-coordinates-display"
+            className="flex items-center space-x-2 px-3.5 py-2.5 bg-zinc-950/80 border border-zinc-800/80 rounded-xl text-xs font-mono shrink-0 shadow-sm"
+          >
+            <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-zinc-400">
+              Coordinates:
+            </span>
+            <span className="font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/20">
+              {posX}%, {posY}%
+            </span>
+          </div>
         </div>
+
+        {/* Custom Branding Requirements Box (Visible when Custom Branding is selected) */}
+        {(activePlacementName === 'Custom Branding' || activePlacementName.toLowerCase().includes('custom') || customNotes.length > 0) && (
+          <div
+            id="custom-branding-requirements-box"
+            className="p-3.5 bg-amber-500/[0.08] border border-amber-400/40 rounded-xl space-y-2 transition-all shadow-md"
+          >
+            <div className="flex items-center justify-between text-xs font-bold text-amber-300">
+              <span className="flex items-center space-x-1.5">
+                <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                <span>Custom Branding Requirements</span>
+              </span>
+              <span className={`text-[11px] font-mono font-bold ${customNotes.length >= 190 ? 'text-rose-400' : 'text-amber-300'}`}>
+                {customNotes.length}/200 characters
+              </span>
+            </div>
+            <textarea
+              id="custom-branding-notes-input"
+              value={customNotes}
+              maxLength={200}
+              onChange={(e) => {
+                const val = e.target.value.slice(0, 200);
+                setCustomNotes(val);
+                if (onUpdateCustomNotes) {
+                  onUpdateCustomNotes(val);
+                }
+                notifyParent(activePlacementName, widthMm, heightMm, activeTechnique, posX, posY, val);
+              }}
+              placeholder="Type what is required (Pantone colors, special positioning, thread specs, machine instructions)..."
+              rows={2}
+              className="w-full px-3 py-2 bg-zinc-950/90 border border-amber-500/40 focus:border-amber-400 rounded-lg text-xs text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-400/50 resize-none font-sans"
+            />
+            <div className="flex items-center justify-between text-[10px] text-zinc-400">
+              <span className="truncate">
+                These notes will follow the procedure throughout the website (Quotation, Client Approval, Artwork, Press, QC).
+              </span>
+              <span className="font-mono text-amber-400 font-bold shrink-0 ml-2">
+                {200 - customNotes.length} left
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Alignment & Rotation Actions */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-zinc-800/80">

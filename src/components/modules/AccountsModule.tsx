@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FileSpreadsheet, RefreshCw, CheckCircle2, DollarSign, ArrowRight, Download, Upload, ExternalLink, ShieldCheck, Database, Layers } from 'lucide-react';
 import { Invoice, Job } from '../../types';
 import { EmailLink } from '../EmailLink';
+import { formatRands, formatTimestamp } from '../../utils/formatters';
 
 interface AccountsModuleProps {
   job: Job;
@@ -41,7 +42,7 @@ export const AccountsModule: React.FC<AccountsModuleProps> = ({
   const handleSyncToSagePastel = () => {
     setIsSyncing('Sage Pastel');
     setTimeout(() => {
-      setInvoice({ ...invoice, syncedToSage: true, syncTimestamp: new Date().toLocaleString() });
+      setInvoice({ ...invoice, syncedToSage: true, syncTimestamp: formatTimestamp() });
       setIsSyncing(null);
       onSaveNotification(`Invoice #${invoice.invoiceNumber} synced to Sage Pastel Accounting ERP!`);
     }, 1200);
@@ -50,7 +51,7 @@ export const AccountsModule: React.FC<AccountsModuleProps> = ({
   const handleSyncToXero = () => {
     setIsSyncing('Xero');
     setTimeout(() => {
-      setInvoice({ ...invoice, syncedToXero: true, syncTimestamp: new Date().toLocaleString() });
+      setInvoice({ ...invoice, syncedToXero: true, syncTimestamp: formatTimestamp() });
       setIsSyncing(null);
       onSaveNotification(`Invoice #${invoice.invoiceNumber} synced to Xero Cloud API!`);
     }, 1200);
@@ -59,14 +60,14 @@ export const AccountsModule: React.FC<AccountsModuleProps> = ({
   const handleSyncToQuickBooks = () => {
     setIsSyncing('QuickBooks');
     setTimeout(() => {
-      setInvoice({ ...invoice, syncedToQuickbooks: true, syncTimestamp: new Date().toLocaleString() });
+      setInvoice({ ...invoice, syncedToQuickbooks: true, syncTimestamp: formatTimestamp() });
       setIsSyncing(null);
       onSaveNotification(`Invoice #${invoice.invoiceNumber} synced to QuickBooks Online!`);
     }, 1200);
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-zinc-950 min-h-full">
+    <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-transparent min-h-full">
       {/* Top Banner */}
       <div className="mirror-card p-4 sm:p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/90 shadow-xl flex flex-wrap justify-between items-center gap-3">
         <div>
@@ -220,19 +221,19 @@ export const AccountsModule: React.FC<AccountsModuleProps> = ({
           <div className="p-3.5 bg-zinc-950/70 border border-zinc-800 rounded-lg">
             <span className="text-[10px] text-zinc-400 font-bold uppercase block">Total Amount</span>
             <span className="text-base font-black text-zinc-100 font-mono mt-1 block">
-              R {invoice.amount.toLocaleString()}
+              {formatRands(invoice.amount)}
             </span>
           </div>
           <div className="p-3.5 bg-zinc-950/70 border border-zinc-800 rounded-lg">
             <span className="text-[10px] text-zinc-400 font-bold uppercase block">Deposit Received</span>
             <span className="text-base font-black text-emerald-400 font-mono mt-1 block">
-              R {invoice.paidAmount.toLocaleString()}
+              {formatRands(invoice.paidAmount)}
             </span>
           </div>
           <div className="p-3.5 bg-zinc-950/70 border border-zinc-800 rounded-lg">
             <span className="text-[10px] text-zinc-400 font-bold uppercase block">Balance Remaining</span>
             <span className="text-base font-black text-rose-400 font-mono mt-1 block">
-              R {(invoice.amount - invoice.paidAmount).toLocaleString()}
+              {formatRands(invoice.amount - invoice.paidAmount)}
             </span>
           </div>
           <div className="p-3.5 bg-zinc-950/70 border border-zinc-800 rounded-lg">

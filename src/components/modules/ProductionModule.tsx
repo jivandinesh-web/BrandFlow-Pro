@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Printer, Play, CheckCircle2, AlertTriangle, Layers, Clock, ArrowRight, Settings } from 'lucide-react';
+import { Printer, Play, CheckCircle2, AlertTriangle, Layers, Clock, ArrowRight, Settings, Edit3 } from 'lucide-react';
 import { Job, ProductionJobCard } from '../../types';
 
 interface ProductionModuleProps {
@@ -33,92 +33,105 @@ export const ProductionModule: React.FC<ProductionModuleProps> = ({
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-zinc-950 min-h-full">
+    <div className="p-6 sm:p-8 space-y-8 font-sans text-zinc-100 bg-transparent min-h-full">
       {/* Header */}
-      <div className="mirror-card p-4 sm:p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/90 shadow-xl flex flex-wrap justify-between items-center gap-3">
+      <div className="mirror-card p-5 sm:p-6 rounded-2xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.35)] flex flex-wrap justify-between items-center gap-4">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-bold text-amber-400">
-            <Printer className="w-4 h-4 text-amber-400" />
-            <span>Press Control - Job Card #{job.jobNumber}</span>
+          <div className="flex items-center space-x-2 text-xs font-semibold text-[#0a84ff]">
+            <Printer className="w-4 h-4 text-[#0a84ff]" />
+            <span>Press Control • Job Card #{job.jobNumber}</span>
           </div>
-          <h2 className="text-lg font-black text-zinc-100 mt-1">{job.projectName}</h2>
+          <h2 className="text-xl font-bold text-white mt-1.5">{job.projectName}</h2>
         </div>
 
         <button
           onClick={() => onNavigate('QualityControl')}
-          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-lg text-xs font-black flex items-center space-x-1.5 shadow-md shadow-amber-500/20 cursor-pointer border border-amber-300/30 transition-all"
+          className="px-4.5 py-2.5 bg-[#0a84ff] hover:bg-[#0071e3] text-white rounded-xl text-xs font-semibold flex items-center space-x-2 shadow-lg shadow-blue-500/20 cursor-pointer border border-white/20 transition-all active:scale-[0.98]"
         >
           <span>Send Job to Quality Control</span>
-          <ArrowRight className="w-4 h-4 text-zinc-950" />
+          <ArrowRight className="w-4 h-4 text-white" />
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Job Card Details */}
-        <div className="lg:col-span-8 mirror-card bg-zinc-900/90 rounded-xl border border-zinc-800/80 shadow-xl p-5 space-y-5">
-          <div className="border-b border-zinc-800 pb-3 flex justify-between items-center">
-            <h3 className="text-xs font-bold uppercase text-zinc-300">
+        <div className="lg:col-span-8 mirror-card rounded-2xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6 space-y-6">
+          <div className="border-b border-white/[0.08] pb-4 flex justify-between items-center">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
               Press Line & Material Job Specs
             </h3>
-            <span className="px-2.5 py-1 bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold rounded-lg text-xs">
+            <span className="px-3 py-1 bg-[#0a84ff]/15 text-[#0a84ff] border border-[#0a84ff]/30 font-semibold rounded-full text-xs">
               {status}
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-            <div className="p-3 bg-zinc-950/70 border border-zinc-800 rounded-lg">
-              <span className="text-[10px] text-zinc-500 font-bold uppercase block">Press Machine</span>
-              <span className="font-bold text-amber-300">
+          {/* Custom Branding Requirements Directive */}
+          {(job.customBrandingNotes || job.quote?.items?.find((i) => i.customBrandingNotes)?.customBrandingNotes) && (
+            <div className="p-4 bg-amber-500/10 border border-amber-400/30 rounded-2xl space-y-1">
+              <div className="flex items-center space-x-1.5 text-xs font-bold text-amber-300">
+                <Edit3 className="w-4 h-4 text-amber-400" />
+                <span>Custom Branding Floor Directives</span>
+              </div>
+              <p className="text-xs text-slate-200 font-sans font-medium">
+                {job.customBrandingNotes || job.quote?.items?.find((i) => i.customBrandingNotes)?.customBrandingNotes}
+              </p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs">
+            <div className="p-4 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl">
+              <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Press Machine</span>
+              <span className="font-semibold text-white mt-1 block">
                 {job.productionCard?.printProcess || 'Heidelberg Speedmaster XL 106'}
               </span>
             </div>
 
-            <div className="p-3 bg-zinc-950/70 border border-zinc-800 rounded-lg">
-              <span className="text-[10px] text-zinc-500 font-bold uppercase block">Paper Stock / Material</span>
-              <span className="font-bold text-zinc-200">
+            <div className="p-4 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl">
+              <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Paper Stock / Material</span>
+              <span className="font-semibold text-slate-200 mt-1 block">
                 {job.productionCard?.paperStockDetails || '350gsm Silk Coated Premium'}
               </span>
             </div>
 
-            <div className="p-3 bg-zinc-950/70 border border-zinc-800 rounded-lg">
-              <span className="text-[10px] text-zinc-500 font-bold uppercase block">Run Quantity</span>
-              <span className="font-bold text-zinc-100 font-mono">
+            <div className="p-4 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl">
+              <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Run Quantity</span>
+              <span className="font-bold text-white font-mono mt-1 block">
                 {job.quantity.toLocaleString()} sheets/units
               </span>
             </div>
           </div>
 
           {/* Interactive Progress Slider */}
-          <div className="p-4 bg-zinc-950/80 border border-zinc-800/80 rounded-xl space-y-3">
-            <div className="flex justify-between items-center text-xs font-bold text-zinc-200">
+          <div className="p-5 bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-2xl space-y-4">
+            <div className="flex justify-between items-center text-xs font-semibold text-slate-200">
               <span>Press Run Completion</span>
-              <span className="font-mono text-sm text-amber-400 font-black">{progress}%</span>
+              <span className="font-mono text-base text-[#0a84ff] font-bold">{progress}%</span>
             </div>
 
-            <div className="w-full bg-zinc-800 h-3 rounded-full overflow-hidden border border-zinc-700/60">
+            <div className="w-full bg-white/[0.06] h-3 rounded-full overflow-hidden border border-white/[0.08]">
               <div
                 style={{ width: `${progress}%` }}
-                className="bg-gradient-to-r from-amber-500 to-amber-600 h-full transition-all duration-300 shadow-sm shadow-amber-500/50"
+                className="bg-[#0a84ff] h-full transition-all duration-300 shadow-sm shadow-blue-500/50 rounded-full"
               />
             </div>
 
-            <div className="flex justify-between text-[11px] text-zinc-500 pt-1">
+            <div className="flex justify-between text-[11px] text-slate-400 pt-1">
               <span>Plate Preparation</span>
               <span>Running Press</span>
               <span>Binding & Trimming</span>
               <span>Ready for QC</span>
             </div>
 
-            <div className="pt-2 flex flex-wrap gap-2">
+            <div className="pt-2 flex flex-wrap gap-2.5">
               <button
                 onClick={() => handleUpdateProgress(Math.min(100, progress + 20))}
-                className="px-3.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold cursor-pointer transition-colors"
+                className="px-4 py-2 bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 border border-white/[0.08] rounded-xl text-xs font-semibold cursor-pointer transition-colors active:scale-95"
               >
                 + Advance Press Progress
               </button>
               <button
                 onClick={() => handleUpdateProgress(100)}
-                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-zinc-950 rounded-lg text-xs font-black cursor-pointer transition-colors"
+                className="px-4 py-2 bg-[#30d158] hover:bg-[#28b84d] text-zinc-950 font-bold rounded-xl text-xs cursor-pointer transition-colors shadow-lg shadow-emerald-500/20 active:scale-95"
               >
                 Mark 100% Press Complete
               </button>
@@ -127,14 +140,14 @@ export const ProductionModule: React.FC<ProductionModuleProps> = ({
 
           {/* Finishing Operations List */}
           <div>
-            <div className="text-xs font-bold text-zinc-300 mb-2">Post-Press Finishing Operations:</div>
-            <div className="flex flex-wrap gap-2 text-xs">
+            <div className="text-xs font-semibold text-slate-300 mb-2.5">Post-Press Finishing Operations:</div>
+            <div className="flex flex-wrap gap-2.5 text-xs">
               {(job.productionCard?.finishingOps || ['Matt Lamination', 'Foil Stamping', 'Die-Cutting']).map((op, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1.5 bg-zinc-950/80 border border-zinc-800 text-zinc-300 font-semibold rounded-lg flex items-center space-x-1.5"
+                  className="px-3.5 py-2 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] text-slate-300 font-medium rounded-xl flex items-center space-x-2"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <CheckCircle2 className="w-4 h-4 text-[#30d158]" />
                   <span>{op}</span>
                 </span>
               ))}
@@ -143,27 +156,27 @@ export const ProductionModule: React.FC<ProductionModuleProps> = ({
         </div>
 
         {/* Press Operator Tag & Scrap Meter */}
-        <div className="lg:col-span-4 mirror-card bg-zinc-900/90 rounded-xl border border-zinc-800/80 shadow-xl p-5 space-y-4">
-          <h3 className="text-xs font-bold uppercase text-zinc-300 border-b border-zinc-800 pb-2">
+        <div className="lg:col-span-4 mirror-card rounded-2xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6 space-y-5">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 border-b border-white/[0.08] pb-3">
             Operator & Waste Metrics
           </h3>
 
-          <div className="space-y-3 text-xs">
-            <div className="p-3 bg-zinc-950/70 border border-zinc-800 rounded-lg">
-              <span className="text-[10px] text-zinc-500 font-bold uppercase block">Master Pressman</span>
-              <span className="font-bold text-zinc-100">{job.productionCard?.operator || 'Garry Thorne'}</span>
+          <div className="space-y-3.5 text-xs">
+            <div className="p-4 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl">
+              <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Master Pressman</span>
+              <span className="font-semibold text-white mt-1 block">{job.productionCard?.operator || 'Garry Thorne'}</span>
             </div>
 
-            <div className="p-3 bg-zinc-950/70 border border-zinc-800 rounded-lg">
-              <span className="text-[10px] text-zinc-500 font-bold uppercase block">Paper Scrap / Waste Rate</span>
-              <span className="font-bold text-emerald-400 font-mono text-sm">
+            <div className="p-4 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl">
+              <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Paper Scrap / Waste Rate</span>
+              <span className="font-bold text-[#30d158] font-mono text-base mt-1 block">
                 {job.productionCard?.scrapPercentage || 1.8}% (Target &lt; 3.0%)
               </span>
             </div>
 
-            <div className="p-3 bg-zinc-950 border border-zinc-800 rounded-lg space-y-1">
-              <div className="text-[10px] text-amber-400 font-bold uppercase">Plate ID Tag</div>
-              <div className="font-mono text-xs font-bold text-amber-300">PLT-992-HEIDELBERG</div>
+            <div className="p-4 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl space-y-1">
+              <div className="text-[10px] text-[#ff9f0a] font-semibold uppercase tracking-wider">Plate ID Tag</div>
+              <div className="font-mono text-xs font-bold text-slate-200">PLT-992-HEIDELBERG</div>
             </div>
           </div>
         </div>

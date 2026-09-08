@@ -2,10 +2,13 @@ import { collection, doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { ClientEmailLog, Job, SystemActivity } from '../types';
 import { ClientReminder } from './notificationHelper';
-import { getLocalStoredEmailLogs, formatCurrentTimestamp } from './emailClientHelper';
+import {
+  getLocalStoredEmailLogs,
+  saveLocalEmailLogs,
+  formatCurrentTimestamp,
+} from './emailClientHelper';
 
 const ADMIN_ACTIVITIES_STORAGE_KEY = 'brandflow_admin_system_activities';
-const CLIENT_EMAIL_LOGS_STORAGE_KEY = 'brandflow_client_email_logs';
 
 /**
  * Returns currently stored admin system activities from localStorage
@@ -146,12 +149,7 @@ export async function logAutoCronBatchExecution({
   // Save new email logs to localStorage
   const existingEmailLogs = getLocalStoredEmailLogs();
   const updatedEmailLogs = [...newEmailLogs, ...existingEmailLogs];
-  try {
-    localStorage.setItem(CLIENT_EMAIL_LOGS_STORAGE_KEY, JSON.stringify(updatedEmailLogs));
-    window.dispatchEvent(new CustomEvent('brandflow:email_logs_updated', { detail: updatedEmailLogs }));
-  } catch (e) {
-    console.error('Failed to update email logs in storage:', e);
-  }
+  saveLocalEmailLogs(updatedEmailLogs);
 
   // 2. Create the Admin Database Audit Log Entry
   const batchCount = reminders.length;
@@ -224,12 +222,7 @@ export async function logSingleReminderExecution({
 
   const existingEmailLogs = getLocalStoredEmailLogs();
   const updatedEmailLogs = [emailLogEntry, ...existingEmailLogs];
-  try {
-    localStorage.setItem(CLIENT_EMAIL_LOGS_STORAGE_KEY, JSON.stringify(updatedEmailLogs));
-    window.dispatchEvent(new CustomEvent('brandflow:email_logs_updated', { detail: updatedEmailLogs }));
-  } catch (e) {
-    console.error('Failed to update email logs in storage:', e);
-  }
+  saveLocalEmailLogs(updatedEmailLogs);
 
   try {
     const logRef = doc(db, 'email_logs', emailLogEntry.id);

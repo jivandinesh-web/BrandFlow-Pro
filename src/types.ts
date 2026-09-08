@@ -65,6 +65,7 @@ export interface PrintItem {
   maxPhysicalWidthMm?: number;
   maxPhysicalHeightMm?: number;
   brandingMethod?: string;
+  customBrandingNotes?: string;
 }
 
 export interface Quote {
@@ -255,6 +256,7 @@ export interface Job {
   deadline: string;
   assignedDesigner: string;
   artworkVersions: ArtworkVersion[];
+  customBrandingNotes?: string;
   quote: Quote;
   proofApproval?: ProofApproval;
   productionCard?: ProductionJobCard;

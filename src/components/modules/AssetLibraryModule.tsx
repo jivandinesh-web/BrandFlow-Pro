@@ -18,7 +18,7 @@ export const AssetLibraryModule: React.FC<AssetLibraryModuleProps> = ({ assets, 
   );
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-zinc-950 min-h-full">
+    <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-transparent min-h-full">
       <div className="mirror-card p-4 sm:p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/90 shadow-xl flex flex-wrap justify-between items-center gap-3">
         <div>
           <div className="flex items-center space-x-2 text-xs font-bold text-amber-400">

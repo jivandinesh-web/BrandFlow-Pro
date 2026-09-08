@@ -11,6 +11,7 @@ import {
 } from '../../utils/notificationHelper';
 import { ClientFollowUpPanel } from '../ClientFollowUpPanel';
 import { getStoredAdminSystemActivities } from '../../utils/auditLogger';
+import { formatRands } from '../../utils/formatters';
 
 interface DashboardModuleProps {
   jobs: Job[];
@@ -248,30 +249,30 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
     switch (priority) {
       case 'Urgent':
         return (
-          <span className="inline-flex items-center space-x-1 text-[10px] font-black px-2 py-0.5 rounded bg-red-600 text-white shadow-2xs border border-red-700 uppercase tracking-wider">
+          <span className="inline-flex items-center space-x-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase tracking-wider">
             <AlertTriangle className="w-2.5 h-2.5 animate-pulse" />
             <span>URGENT</span>
           </span>
         );
       case 'High':
         return (
-          <span className="inline-flex items-center space-x-1 text-[10px] font-extrabold px-2 py-0.5 rounded bg-red-100 text-red-800 border border-red-300 uppercase tracking-wider">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-600"></span>
-            <span>HIGH PRIORITY</span>
+          <span className="inline-flex items-center space-x-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            <span>HIGH</span>
           </span>
         );
       case 'Medium':
         return (
-          <span className="inline-flex items-center space-x-1 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 uppercase tracking-wider">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-            <span>MED PRIORITY</span>
+          <span className="inline-flex items-center space-x-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/30 uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#0a84ff]"></span>
+            <span>MEDIUM</span>
           </span>
         );
       case 'Low':
         return (
-          <span className="inline-flex items-center space-x-1 text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 uppercase tracking-wider">
+          <span className="inline-flex items-center space-x-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-400 border border-white/[0.08] uppercase tracking-wider">
             <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-            <span>LOW PRIORITY</span>
+            <span>LOW</span>
           </span>
         );
       default:
@@ -282,46 +283,46 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
   const getActivityIcon = (category: SystemActivity['category']) => {
     switch (category) {
       case 'Proof Approval':
-        return <CheckCircle2 className="w-4 h-4 text-emerald-600" />;
+        return <CheckCircle2 className="w-4 h-4 text-[#30d158]" />;
       case 'Job Update':
-        return <RotateCcw className="w-4 h-4 text-blue-600" />;
+        return <RotateCcw className="w-4 h-4 text-[#0a84ff]" />;
       case 'Artwork Upload':
-        return <Upload className="w-4 h-4 text-purple-600" />;
+        return <Upload className="w-4 h-4 text-[#bf5af2]" />;
       case 'Invoicing':
-        return <DollarSign className="w-4 h-4 text-amber-600" />;
+        return <DollarSign className="w-4 h-4 text-amber-400" />;
       case 'QC Inspection':
-        return <ShieldCheck className="w-4 h-4 text-teal-600" />;
+        return <ShieldCheck className="w-4 h-4 text-teal-400" />;
       case 'Dispatch':
-        return <Truck className="w-4 h-4 text-indigo-600" />;
+        return <Truck className="w-4 h-4 text-indigo-400" />;
       case 'Quotation':
-        return <FileText className="w-4 h-4 text-sky-600" />;
+        return <FileText className="w-4 h-4 text-sky-400" />;
       case 'Press Status':
-        return <Printer className="w-4 h-4 text-slate-700" />;
+        return <Printer className="w-4 h-4 text-slate-300" />;
       default:
-        return <Activity className="w-4 h-4 text-slate-600" />;
+        return <Activity className="w-4 h-4 text-slate-400" />;
     }
   };
 
   const getActivityBg = (category: SystemActivity['category']) => {
     switch (category) {
       case 'Proof Approval':
-        return 'bg-emerald-50 border-emerald-200 text-emerald-950';
+        return 'bg-emerald-500/15 border-emerald-500/30 text-emerald-200';
       case 'Job Update':
-        return 'bg-blue-50 border-blue-200 text-blue-950';
+        return 'bg-blue-500/15 border-blue-500/30 text-blue-200';
       case 'Artwork Upload':
-        return 'bg-purple-50 border-purple-200 text-purple-950';
+        return 'bg-purple-500/15 border-purple-500/30 text-purple-200';
       case 'Invoicing':
-        return 'bg-amber-50 border-amber-200 text-amber-950';
+        return 'bg-amber-500/15 border-amber-500/30 text-amber-200';
       case 'QC Inspection':
-        return 'bg-teal-50 border-teal-200 text-teal-950';
+        return 'bg-teal-500/15 border-teal-500/30 text-teal-200';
       case 'Dispatch':
-        return 'bg-indigo-50 border-indigo-200 text-indigo-950';
+        return 'bg-indigo-500/15 border-indigo-500/30 text-indigo-200';
       case 'Quotation':
-        return 'bg-sky-50 border-sky-200 text-sky-950';
+        return 'bg-sky-500/15 border-sky-500/30 text-sky-200';
       case 'Press Status':
-        return 'bg-slate-100 border-slate-300 text-slate-900';
+        return 'bg-white/[0.06] border-white/[0.08] text-slate-200';
       default:
-        return 'bg-slate-50 border-slate-200 text-slate-900';
+        return 'bg-white/[0.05] border-white/[0.08] text-slate-300';
     }
   };
 
@@ -347,32 +348,32 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
   };
 
   return (
-    <div className="p-6 space-y-6 font-sans text-slate-800 bg-transparent min-h-full">
-      {/* KPI Cards: Consistent 4-column grid on desktop, 2-column on tablet, 1 on mobile */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="p-6 sm:p-8 space-y-8 font-sans text-zinc-100 bg-transparent min-h-full">
+      {/* KPI Cards: Apple frosted glass aesthetic with soft diffuse shadows and generous padding */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* KPI 1: Active Jobs Queue */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.05 }}
+          transition={{ duration: 0.25, delay: 0.05 }}
           onClick={() => onNavigate('Production')}
-          className="mirror-card rounded-2xl p-4.5 border border-white/10 hover:border-indigo-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-lg relative overflow-hidden group"
+          className="mirror-card rounded-2xl p-5 border border-white/[0.08] hover:border-blue-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-[0_8px_32px_rgba(0,0,0,0.35)] relative overflow-hidden group"
         >
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Active Press Queue</p>
-              <h3 className="text-2xl font-black text-white mt-1 tracking-tight">{activeJobsCount} Jobs</h3>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 font-mono">Active Press Queue</p>
+              <h3 className="text-2xl sm:text-3xl font-bold text-white mt-1.5 tracking-tight">{activeJobsCount} Jobs</h3>
             </div>
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25 group-hover:scale-110 transition-transform">
-              <Package className="w-4 h-4" />
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-[#0a84ff] to-[#5e5ce6] text-white shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform border border-white/20">
+              <Package className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">
-              <TrendingUp className="w-3 h-3 text-emerald-400" />
+          <div className="mt-4 pt-3.5 border-t border-white/[0.08] flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1.5 text-[11px] font-semibold text-[#30d158] bg-[#30d158]/15 border border-[#30d158]/30 px-2.5 py-0.5 rounded-full">
+              <TrendingUp className="w-3 h-3 text-[#30d158]" />
               +14.2% this wk
             </span>
-            <span className="text-[10px] text-slate-400 font-medium font-mono">{urgentCount} Urgent</span>
+            <span className="text-[11px] text-slate-400 font-medium font-mono">{urgentCount} Urgent</span>
           </div>
         </motion.div>
 
@@ -380,25 +381,25 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.1 }}
+          transition={{ duration: 0.25, delay: 0.1 }}
           onClick={() => onNavigate('Accounts')}
-          className="mirror-card rounded-2xl p-4.5 border border-white/10 hover:border-indigo-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-lg relative overflow-hidden group"
+          className="mirror-card rounded-2xl p-5 border border-white/[0.08] hover:border-emerald-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-[0_8px_32px_rgba(0,0,0,0.35)] relative overflow-hidden group"
         >
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Monthly Revenue</p>
-              <h3 className="text-2xl font-black text-white mt-1 tracking-tight">R {totalRevenue.toLocaleString()}</h3>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 font-mono">Monthly Revenue</p>
+              <h3 className="text-2xl sm:text-3xl font-bold text-white mt-1.5 tracking-tight">{formatRands(totalRevenue)}</h3>
             </div>
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 group-hover:scale-110 transition-transform">
-              <DollarSign className="w-4 h-4" />
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-[#30d158] to-teal-500 text-white shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform border border-white/20">
+              <DollarSign className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">
-              <TrendingUp className="w-3 h-3 text-emerald-400" />
+          <div className="mt-4 pt-3.5 border-t border-white/[0.08] flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1.5 text-[11px] font-semibold text-[#30d158] bg-[#30d158]/15 border border-[#30d158]/30 px-2.5 py-0.5 rounded-full">
+              <TrendingUp className="w-3 h-3 text-[#30d158]" />
               +8.5% vs target
             </span>
-            <span className="text-[10px] text-slate-400 font-medium font-mono">100% Invoiced</span>
+            <span className="text-[11px] text-slate-400 font-medium font-mono">100% Invoiced</span>
           </div>
         </motion.div>
 
@@ -406,25 +407,25 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.15 }}
+          transition={{ duration: 0.25, delay: 0.15 }}
           onClick={() => onNavigate('PdfProofApproval')}
-          className="mirror-card rounded-2xl p-4.5 border border-white/10 hover:border-indigo-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-lg relative overflow-hidden group"
+          className="mirror-card rounded-2xl p-5 border border-white/[0.08] hover:border-amber-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-[0_8px_32px_rgba(0,0,0,0.35)] relative overflow-hidden group"
         >
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">Client Proofs Queue</p>
-              <h3 className="text-2xl font-black text-white mt-1 tracking-tight">{pendingProofCount} Pending</h3>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 font-mono">Client Proofs Queue</p>
+              <h3 className="text-2xl sm:text-3xl font-bold text-white mt-1.5 tracking-tight">{pendingProofCount} Pending</h3>
             </div>
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/25 group-hover:scale-110 transition-transform">
-              <FileText className="w-4 h-4" />
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-[#ff9f0a] to-orange-500 text-white shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform border border-white/20">
+              <FileText className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1 text-[11px] font-bold text-amber-300 bg-amber-950/60 border border-amber-800/60 px-2 py-0.5 rounded-full">
+          <div className="mt-4 pt-3.5 border-t border-white/[0.08] flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
               <Clock className="w-3 h-3 text-amber-300" />
               1.8 hr avg turnaround
             </span>
-            <span className="text-[10px] text-slate-400 font-medium font-mono">Crypto Signed</span>
+            <span className="text-[11px] text-slate-400 font-medium font-mono">Crypto Signed</span>
           </div>
         </motion.div>
 
@@ -432,25 +433,25 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.2 }}
+          transition={{ duration: 0.25, delay: 0.2 }}
           onClick={() => onNavigate('QualityControl')}
-          className="mirror-card rounded-2xl p-4.5 border border-white/10 hover:border-indigo-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-lg relative overflow-hidden group"
+          className="mirror-card rounded-2xl p-5 border border-white/[0.08] hover:border-purple-500/40 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-[0_8px_32px_rgba(0,0,0,0.35)] relative overflow-hidden group"
         >
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">QC & Press Yield</p>
-              <h3 className="text-2xl font-black text-white mt-1 tracking-tight">99.2% PASS</h3>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 font-mono">QC & Press Yield</p>
+              <h3 className="text-2xl sm:text-3xl font-bold text-white mt-1.5 tracking-tight">99.2% PASS</h3>
             </div>
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-md shadow-purple-500/25 group-hover:scale-110 transition-transform">
-              <ShieldCheck className="w-4 h-4" />
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-[#bf5af2] to-pink-500 text-white shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform border border-white/20">
+              <ShieldCheck className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">
-              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+          <div className="mt-4 pt-3.5 border-t border-white/[0.08] flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1.5 text-[11px] font-semibold text-[#30d158] bg-[#30d158]/15 border border-[#30d158]/30 px-2.5 py-0.5 rounded-full">
+              <CheckCircle2 className="w-3 h-3 text-[#30d158]" />
               Delta-E &lt; 1.5
             </span>
-            <span className="text-[10px] text-slate-400 font-medium font-mono">ISO 12647-2</span>
+            <span className="text-[11px] text-slate-400 font-medium font-mono">ISO 12647-2</span>
           </div>
         </motion.div>
       </div>
@@ -461,58 +462,58 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
       {/* Machine Press Status & System Overview */}
       <div className="grid grid-cols-1 gap-6">
         {/* Real-time Press Lines Monitor with Mirror Card Finish */}
-        <div className="mirror-card rounded-2xl p-5 space-y-4">
-          <div className="flex justify-between items-center border-b border-slate-200/80 pb-3">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20">
-                <Printer className="w-4 h-4" />
+        <div className="mirror-card rounded-2xl p-6 space-y-5 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
+          <div className="flex justify-between items-center border-b border-white/[0.08] pb-4">
+            <div className="flex items-center space-x-3.5">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-[#0a84ff] to-[#5e5ce6] text-white shadow-lg shadow-blue-500/20 border border-white/20">
+                <Printer className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-xs font-black uppercase tracking-wider text-indigo-700 font-mono">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#0a84ff] font-mono">
                   Machine Press Lines Live Status
                 </span>
-                <p className="text-[11px] text-slate-500">Automated press telemetry & cycle counters</p>
+                <p className="text-xs text-slate-400 mt-0.5">Automated press telemetry & cycle counters</p>
               </div>
             </div>
-            <span className="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full font-mono font-bold flex items-center gap-1.5 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[11px] bg-[#30d158]/15 text-[#30d158] border border-[#30d158]/30 px-3.5 py-1 rounded-full font-mono font-semibold flex items-center gap-2 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#30d158] animate-pulse" />
               3/4 Units Active
             </span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-            <div className="bg-white/80 p-3.5 rounded-xl border border-slate-200/80 hover:border-indigo-300 transition-all flex justify-between items-center shadow-2xs">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div className="bg-white/[0.03] backdrop-blur-xl p-4.5 rounded-2xl border border-white/[0.08] hover:border-white/[0.18] transition-all flex justify-between items-center shadow-xs">
               <div>
-                <div className="font-bold text-slate-800 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <div className="font-semibold text-white flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#30d158]" />
                   Heidelberg XL 106
                 </div>
-                <div className="text-[10px] text-slate-500 mt-0.5 font-mono">Offset • Batch #BF-2026-8941</div>
+                <div className="text-[11px] text-slate-400 mt-1 font-mono">Offset • Batch #BF-2026-8941</div>
               </div>
-              <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-lg border border-emerald-200 font-mono">
+              <span className="px-3 py-1 bg-[#30d158]/15 text-[#30d158] text-[10px] font-semibold rounded-full border border-[#30d158]/30 font-mono">
                 8,500 SPH
               </span>
             </div>
-            <div className="bg-white/80 p-3.5 rounded-xl border border-slate-200/80 hover:border-indigo-300 transition-all flex justify-between items-center shadow-2xs">
+            <div className="bg-white/[0.03] backdrop-blur-xl p-4.5 rounded-2xl border border-white/[0.08] hover:border-white/[0.18] transition-all flex justify-between items-center shadow-xs">
               <div>
-                <div className="font-bold text-slate-800 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <div className="font-semibold text-white flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#30d158]" />
                   HP Indigo 7K Digital
                 </div>
-                <div className="text-[10px] text-slate-500 mt-0.5 font-mono">Digital • Ready / Idle</div>
+                <div className="text-[11px] text-slate-400 mt-1 font-mono">Digital • Ready / Idle</div>
               </div>
-              <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-black rounded-lg border border-indigo-200 font-mono">
+              <span className="px-3 py-1 bg-[#0a84ff]/15 text-[#0a84ff] text-[10px] font-semibold rounded-full border border-[#0a84ff]/30 font-mono">
                 Running
               </span>
             </div>
-            <div className="bg-white/80 p-3.5 rounded-xl border border-slate-200/80 hover:border-indigo-300 transition-all flex justify-between items-center shadow-2xs">
+            <div className="bg-white/[0.03] backdrop-blur-xl p-4.5 rounded-2xl border border-white/[0.08] hover:border-white/[0.18] transition-all flex justify-between items-center shadow-xs">
               <div>
-                <div className="font-bold text-slate-800 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                <div className="font-semibold text-white flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#ff9f0a] animate-pulse" />
                   Roland TrueVIS UV
                 </div>
-                <div className="text-[10px] text-slate-500 mt-0.5 font-mono">UV Wide Format • Maint</div>
+                <div className="text-[11px] text-slate-400 mt-1 font-mono">UV Wide Format • Maint</div>
               </div>
-              <span className="px-2.5 py-1 bg-amber-50 text-amber-700 text-[10px] font-black rounded-lg border border-amber-200 font-mono">
+              <span className="px-3 py-1 bg-[#ff9f0a]/15 text-amber-300 text-[10px] font-semibold rounded-full border border-[#ff9f0a]/30 font-mono">
                 Cleaning
               </span>
             </div>
@@ -521,20 +522,20 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
       </div>
 
       {/* Recent System Activity Log Panel */}
-      <div className="mirror-card rounded-2xl overflow-hidden shadow-xl">
-        <div className="bg-white/80 backdrop-blur-md px-5 py-3.5 border-b border-slate-200/80 flex flex-wrap justify-between items-center gap-3">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white font-black rounded-xl shadow-md shadow-indigo-500/20">
-              <Activity className="w-4 h-4" />
+      <div className="mirror-card rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
+        <div className="bg-white/[0.04] backdrop-blur-xl px-6 py-4.5 border-b border-white/[0.08] flex flex-wrap justify-between items-center gap-4">
+          <div className="flex items-center space-x-3.5">
+            <div className="p-3 bg-gradient-to-br from-[#0a84ff] to-[#5e5ce6] text-white rounded-2xl shadow-lg shadow-blue-500/20 border border-white/20">
+              <Activity className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-xs font-extrabold uppercase text-slate-900 tracking-wider flex items-center space-x-2">
+              <h3 className="text-sm font-bold uppercase text-white tracking-wider flex items-center space-x-2.5">
                 <span>Real-Time Audit Trail</span>
-                <span className="text-[10px] font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full font-mono">
+                <span className="text-[10px] font-semibold bg-[#0a84ff]/15 text-[#0a84ff] border border-[#0a84ff]/30 px-2.5 py-0.5 rounded-full font-mono">
                   Last 10 Records
                 </span>
               </h3>
-              <p className="text-[11px] text-slate-500 font-medium">
+              <p className="text-xs text-slate-400 font-medium mt-0.5">
                 Live audit logs of job revisions, cryptographic signatures, preflight telemetry & press operations
               </p>
             </div>
@@ -542,30 +543,30 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
 
           <div className="flex items-center space-x-3 flex-wrap gap-y-2">
             {/* Live Feed Status Pill */}
-            <span className="flex items-center space-x-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="flex items-center space-x-2 text-[11px] font-medium text-[#30d158] bg-[#30d158]/15 px-3 py-1 rounded-full border border-[#30d158]/30">
+              <span className="w-2 h-2 rounded-full bg-[#30d158] animate-pulse"></span>
               <span>Active Sentinel Feed</span>
             </span>
 
             {/* Priority Filter Pills */}
-            <div className="flex items-center bg-slate-100/90 border border-slate-200 p-0.5 rounded-xl text-xs font-bold text-slate-700">
-              <span className="text-[10px] text-slate-400 uppercase px-2 font-black tracking-wider">Priority:</span>
+            <div className="flex items-center bg-white/[0.05] border border-white/[0.08] p-1 rounded-xl text-xs font-medium text-slate-300">
+              <span className="text-[10px] text-slate-400 uppercase px-2 font-semibold tracking-wider">Priority:</span>
               {['All', 'Urgent', 'High', 'Medium', 'Low'].map((prio) => (
                 <button
                   key={prio}
                   onClick={() => setActivePriorityFilter(prio)}
-                  className={`px-2 py-0.5 rounded-lg text-[10px] font-black transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all cursor-pointer ${
                     activePriorityFilter === prio
                       ? prio === 'Urgent'
-                        ? 'bg-rose-500 text-white shadow-2xs'
+                        ? 'bg-rose-500 text-white shadow-xs'
                         : prio === 'High'
-                        ? 'bg-amber-500 text-white shadow-2xs'
+                        ? 'bg-amber-500 text-white shadow-xs'
                         : prio === 'Medium'
-                        ? 'bg-indigo-600 text-white shadow-2xs'
+                        ? 'bg-[#0a84ff] text-white shadow-xs'
                         : prio === 'Low'
-                        ? 'bg-slate-700 text-white shadow-2xs'
-                        : 'bg-indigo-600 text-white shadow-2xs'
-                      : 'text-slate-500 hover:text-slate-900'
+                        ? 'bg-white/[0.2] text-white shadow-xs'
+                        : 'bg-[#0a84ff] text-white shadow-xs'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   {prio}
@@ -574,15 +575,15 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
             </div>
 
             {/* Category Filter Pills */}
-            <div className="flex items-center bg-slate-100/90 border border-slate-200 p-0.5 rounded-xl text-xs font-bold text-slate-700">
+            <div className="flex items-center bg-white/[0.05] border border-white/[0.08] p-1 rounded-xl text-xs font-medium text-slate-300">
               {['All', 'Auto Cron', 'Updates', 'Proofs', 'QC & Accounts', 'Dispatch'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategoryFilter(cat)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
                     activeCategoryFilter === cat
-                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-2xs'
-                      : 'text-slate-500 hover:text-slate-900'
+                      ? 'bg-[#0a84ff] text-white shadow-xs'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   {cat}
@@ -592,43 +593,43 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
           </div>
         </div>
 
-        <div className="p-4 bg-white/40">
-          <div className="divide-y divide-slate-100">
+        <div className="p-4 sm:p-5 bg-transparent">
+          <div className="divide-y divide-white/[0.06]">
             {last10Activities.map((act) => (
               <div
                 key={act.id}
                 onClick={() => handleActivityClick(act)}
-                className="py-3 px-3 hover:bg-indigo-50/50 rounded-xl transition-colors flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 group cursor-pointer"
+                className="py-3.5 px-4 hover:bg-white/[0.04] rounded-2xl transition-all duration-200 flex flex-wrap sm:flex-nowrap items-center justify-between gap-4 group cursor-pointer"
               >
-                <div className="flex items-start space-x-3 flex-1 min-w-0">
+                <div className="flex items-start space-x-3.5 flex-1 min-w-0">
                   {/* Category Icon Badge */}
                   <div
-                    className="p-2.5 rounded-xl border border-slate-200/80 bg-white flex-shrink-0 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform"
+                    className="p-3 rounded-2xl border border-white/[0.08] bg-white/[0.05] flex-shrink-0 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform"
                   >
                     {getActivityIcon(act.category)}
                   </div>
 
                   {/* Activity Description & User info */}
-                  <div className="space-y-0.5 min-w-0">
+                  <div className="space-y-1 min-w-0">
                     <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-mono">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 bg-white/[0.06] px-2 py-0.5 rounded-full font-mono border border-white/[0.08]">
                         {act.category}
                       </span>
                       {renderPriorityBadge(act.priority)}
                       {act.jobNumber && (
-                        <span className="text-[11px] font-mono font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200/80 group-hover:bg-indigo-600 group-hover:text-white transition-colors flex items-center shadow-2xs">
+                        <span className="text-[11px] font-mono font-semibold text-[#0a84ff] bg-[#0a84ff]/15 px-2 py-0.5 rounded-full border border-[#0a84ff]/30 group-hover:bg-[#0a84ff] group-hover:text-white transition-colors flex items-center shadow-xs">
                           #{act.jobNumber}
                           <ExternalLink className="w-2.5 h-2.5 ml-1 opacity-70" />
                         </span>
                       )}
                       {act.statusBadge && (
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded font-mono ${
+                          className={`text-[10px] font-medium px-2.5 py-0.5 rounded-full font-mono ${
                             act.statusBadge.includes('PASS') || act.statusBadge.includes('Signed') || act.statusBadge.includes('Approved')
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              ? 'bg-[#30d158]/15 text-[#30d158] border border-[#30d158]/30'
                               : act.statusBadge.includes('URGENT')
-                              ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                              : 'bg-slate-100 text-slate-700 border border-slate-200'
+                              ? 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
+                              : 'bg-white/[0.06] text-slate-300 border border-white/[0.08]'
                           }`}
                         >
                           {act.statusBadge}
@@ -636,18 +637,18 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
                       )}
                     </div>
 
-                    <p className="text-xs font-medium text-slate-800 leading-snug group-hover:text-indigo-900 transition-colors">
+                    <p className="text-xs font-medium text-slate-200 leading-snug group-hover:text-white transition-colors">
                       {act.description}
                     </p>
 
                     <div className="flex items-center space-x-3 text-[11px] text-slate-400 font-medium pt-0.5">
-                      <span className="flex items-center space-x-1">
-                        <Users className="w-3 h-3 text-slate-400" />
+                      <span className="flex items-center space-x-1.5">
+                        <Users className="w-3.5 h-3.5 text-slate-500" />
                         <span>{act.user}</span>
                       </span>
-                      <span className="text-slate-300">•</span>
-                      <span className="flex items-center space-x-1 font-mono text-slate-400">
-                        <Clock className="w-3 h-3 text-slate-400" />
+                      <span className="text-slate-600">•</span>
+                      <span className="flex items-center space-x-1.5 font-mono text-slate-400">
+                        <Clock className="w-3.5 h-3.5 text-slate-500" />
                         <span>{act.timeAgo || act.timestamp}</span>
                       </span>
                     </div>
@@ -655,11 +656,11 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
                 </div>
 
                 {/* Right side timestamp & Quick action hint */}
-                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center w-full sm:w-auto text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                  <span className="text-[11px] font-mono font-bold text-slate-400">
+                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center w-full sm:w-auto text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-white/[0.06]">
+                  <span className="text-[11px] font-mono font-medium text-slate-400">
                     {getSafeTimestampDisplay(act.timestamp)}
                   </span>
-                  <span className="text-[11px] font-bold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity flex items-center mt-1">
+                  <span className="text-[11px] font-semibold text-[#0a84ff] opacity-0 group-hover:opacity-100 transition-opacity flex items-center mt-1">
                     Inspect <ArrowRight className="w-3 h-3 ml-0.5" />
                   </span>
                 </div>

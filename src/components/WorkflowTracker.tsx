@@ -25,10 +25,10 @@ export const WorkflowTracker: React.FC<WorkflowTrackerProps> = ({
   const currentStageIndex = STAGES.findIndex((s) => s.module === selectedJob.stage || s.stage === selectedJob.stage);
 
   return (
-    <section className="bg-white/75 backdrop-blur-xl border-b border-slate-200/80 h-14 flex items-center px-6 space-x-2 flex-shrink-0 text-xs font-bold overflow-x-auto scrollbar-thin relative z-10 shadow-2xs">
-      <div className="flex items-center space-x-2 shrink-0 pr-4 border-r border-slate-200">
-        <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest font-mono">Job Pipeline</span>
-        <span className="text-xs font-mono font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200">{selectedJob.jobNumber}</span>
+    <section className="bg-[#141416]/75 backdrop-blur-2xl border-b border-white/[0.08] h-14 flex items-center px-6 space-x-3 flex-shrink-0 text-xs font-semibold overflow-x-auto scrollbar-thin relative z-10 shadow-[0_1px_2px_rgba(0,0,0,0.2)]">
+      <div className="flex items-center space-x-2.5 shrink-0 pr-4 border-r border-white/[0.08]">
+        <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider font-mono">Job Pipeline</span>
+        <span className="text-xs font-mono font-bold text-white bg-white/[0.08] px-2.5 py-0.5 rounded-lg border border-white/[0.08]">{selectedJob.jobNumber}</span>
       </div>
 
       <div className="flex items-center space-x-2 min-w-max py-0.5">
@@ -40,42 +40,42 @@ export const WorkflowTracker: React.FC<WorkflowTrackerProps> = ({
             <React.Fragment key={s.stage}>
               <button
                 onClick={() => onNavigateToModule(s.module)}
-                className={`flex items-center text-xs font-bold transition-all duration-200 cursor-pointer px-3 py-1.5 rounded-xl active:scale-95 ${
+                className={`flex items-center text-xs font-medium transition-all duration-200 cursor-pointer px-3 py-1.5 rounded-xl active:scale-95 ${
                   isCurrent
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md shadow-indigo-500/25 text-white border border-white/20'
+                    ? 'bg-[#0a84ff] shadow-[0_2px_12px_rgba(10,132,255,0.35)] text-white border border-white/20'
                     : isCompleted
-                    ? 'text-indigo-700 bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200/80'
-                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/90'
+                    ? 'text-blue-400 bg-blue-500/10 hover:bg-blue-500/15 border border-blue-500/20'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.05]'
                 }`}
               >
                 <div
-                  className={`w-5 h-5 rounded-full border flex items-center justify-center mr-2 text-[10px] font-black shrink-0 transition-all ${
+                  className={`w-4.5 h-4.5 rounded-full border flex items-center justify-center mr-2 text-[10px] font-bold shrink-0 transition-all ${
                     isCurrent
-                      ? 'border-white/60 text-indigo-700 bg-white shadow-2xs'
+                      ? 'border-white/80 text-[#0a84ff] bg-white shadow-2xs'
                       : isCompleted
-                      ? 'border-indigo-300 bg-indigo-200/60 text-indigo-700'
-                      : 'border-slate-300 text-slate-400 bg-white'
+                      ? 'border-blue-400/40 bg-blue-500/20 text-blue-400'
+                      : 'border-white/10 text-slate-500 bg-white/[0.04]'
                   }`}
                 >
                   {isCompleted ? '✓' : index + 1}
                 </div>
-                <span className="tracking-wider">{s.label}</span>
+                <span className="tracking-wide text-[11px]">{s.label}</span>
               </button>
               {index < STAGES.length - 1 && (
-                <div className="w-4 h-px bg-slate-200 shrink-0 mx-0.5" />
+                <div className="w-3 h-px bg-white/[0.08] shrink-0 mx-0.5" />
               )}
             </React.Fragment>
           );
         })}
       </div>
 
-      <div className="hidden lg:flex items-center space-x-2 text-[11px] text-slate-500 shrink-0 pl-4 border-l border-slate-200">
-        <span className="font-mono text-slate-400">Priority:</span>
+      <div className="hidden lg:flex items-center space-x-2 text-[11px] text-slate-400 shrink-0 pl-4 border-l border-white/[0.08]">
+        <span className="font-mono text-slate-500">Priority:</span>
         <span
-          className={`px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider ${
+          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
             selectedJob.priority.includes('URGENT')
-              ? 'bg-rose-50 text-rose-700 border border-rose-200 shadow-2xs'
-              : 'bg-amber-50 text-amber-700 border border-amber-200 shadow-2xs'
+              ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+              : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
           }`}
         >
           {selectedJob.priority}

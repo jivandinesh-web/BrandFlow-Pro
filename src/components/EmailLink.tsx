@@ -4,9 +4,14 @@ import {
   POPULAR_MAIL_PROGRAMS,
   sendAndLogEmail,
   formatCurrentTimestamp,
+  getMailtoUrl,
+  getGmailWebComposeUrl,
 } from '../utils/emailClientHelper';
 import { PopularMailProgram } from '../types';
 import { ClientEmailModal } from './ClientEmailModal';
+
+// Re-export shared URL generators for backward compatibility
+export { getMailtoUrl, getGmailWebComposeUrl };
 
 interface EmailLinkProps {
   email: string;
@@ -29,44 +34,6 @@ interface EmailLinkProps {
   inline?: boolean;
   onLogAction?: (logId: string) => void;
   onSaveNotification?: (msg: string) => void;
-}
-
-/**
- * Utility to generate a standard mailto: URL for Outlook, Apple Mail, Thunderbird, etc.
- */
-export function getMailtoUrl(
-  email: string,
-  options?: { subject?: string; body?: string; cc?: string; bcc?: string }
-): string {
-  if (!email) return '#';
-  const params = new URLSearchParams();
-  if (options?.subject) params.append('subject', options.subject);
-  if (options?.body) params.append('body', options.body);
-  if (options?.cc) params.append('cc', options.cc);
-  if (options?.bcc) params.append('bcc', options.bcc);
-
-  const query = params.toString();
-  return `mailto:${email}${query ? `?${query}` : ''}`;
-}
-
-/**
- * Utility to generate a direct web Gmail compose URL
- */
-export function getGmailWebComposeUrl(
-  email: string,
-  options?: { subject?: string; body?: string; cc?: string; bcc?: string }
-): string {
-  if (!email) return '#';
-  const params = new URLSearchParams();
-  params.append('view', 'cm');
-  params.append('fs', '1');
-  params.append('to', email);
-  if (options?.subject) params.append('su', options.subject);
-  if (options?.body) params.append('body', options.body);
-  if (options?.cc) params.append('cc', options.cc);
-  if (options?.bcc) params.append('bcc', options.bcc);
-
-  return `https://mail.google.com/mail/?${params.toString()}`;
 }
 
 /**

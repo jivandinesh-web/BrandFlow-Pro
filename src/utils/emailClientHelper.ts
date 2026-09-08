@@ -1,6 +1,7 @@
 import { collection, doc, setDoc, onSnapshot, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { ClientEmailLog, PopularMailProgram } from '../types';
+import { formatTimestamp } from './formatters';
 
 export interface MailProgramOption {
   id: PopularMailProgram;
@@ -150,14 +151,15 @@ const INITIAL_EMAIL_LOGS: ClientEmailLog[] = [
   },
 ];
 
-const LOCAL_STORAGE_KEY = 'brandflow_client_email_logs';
+export const CLIENT_EMAIL_LOGS_STORAGE_KEY = 'brandflow_client_email_logs';
+export const EMAIL_LOGS_UPDATED_EVENT = 'brandflow:email_logs_updated';
 
 /**
  * Retrieves local stored logs
  */
 export function getLocalStoredEmailLogs(): ClientEmailLog[] {
   try {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const saved = localStorage.getItem(CLIENT_EMAIL_LOGS_STORAGE_KEY);
     if (saved) {
       return JSON.parse(saved);
     }
@@ -170,10 +172,10 @@ export function getLocalStoredEmailLogs(): ClientEmailLog[] {
 /**
  * Saves logs to localStorage and emits an update event
  */
-function saveLocalEmailLogs(logs: ClientEmailLog[]) {
+export function saveLocalEmailLogs(logs: ClientEmailLog[]) {
   try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(logs));
-    window.dispatchEvent(new CustomEvent('brandflow:email_logs_updated', { detail: logs }));
+    localStorage.setItem(CLIENT_EMAIL_LOGS_STORAGE_KEY, JSON.stringify(logs));
+    window.dispatchEvent(new CustomEvent(EMAIL_LOGS_UPDATED_EVENT, { detail: logs }));
   } catch (e) {
     console.error('Failed writing email logs to localStorage:', e);
   }
@@ -198,14 +200,45 @@ export interface SendAndLogEmailParams {
  * Formats current date and time into a clean timestamp string: "YYYY-MM-DD HH:mm:ss"
  */
 export function formatCurrentTimestamp(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  return formatTimestamp(new Date());
+}
+
+/**
+ * Shared utility to generate a standard mailto: URL with optional subject and body
+ */
+export function getMailtoUrl(
+  email: string,
+  options?: { subject?: string; body?: string; cc?: string; bcc?: string }
+): string {
+  if (!email) return '#';
+  const params = new URLSearchParams();
+  if (options?.subject) params.append('subject', options.subject);
+  if (options?.body) params.append('body', options.body);
+  if (options?.cc) params.append('cc', options.cc);
+  if (options?.bcc) params.append('bcc', options.bcc);
+
+  const query = params.toString();
+  return `mailto:${email}${query ? `?${query}` : ''}`;
+}
+
+/**
+ * Shared utility to generate a direct web Gmail compose URL
+ */
+export function getGmailWebComposeUrl(
+  email: string,
+  options?: { subject?: string; body?: string; cc?: string; bcc?: string }
+): string {
+  if (!email) return '#';
+  const params = new URLSearchParams();
+  params.append('view', 'cm');
+  params.append('fs', '1');
+  params.append('to', email);
+  if (options?.subject) params.append('su', options.subject);
+  if (options?.body) params.append('body', options.body);
+  if (options?.cc) params.append('cc', options.cc);
+  if (options?.bcc) params.append('bcc', options.bcc);
+
+  return `https://mail.google.com/mail/?${params.toString()}`;
 }
 
 /**

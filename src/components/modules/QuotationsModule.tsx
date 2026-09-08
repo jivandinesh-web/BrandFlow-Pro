@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { Job, PrintItem } from '../../types';
 import { INITIAL_CUSTOMERS } from '../../data/mockData';
+import { formatRands, formatNumber } from '../../utils/formatters';
 import { BrandingPreviewCanvas } from '../BrandingPreviewCanvas';
 import { triggerQuotationNotification } from '../../utils/notificationHelper';
 import { EmailLink } from '../EmailLink';
@@ -333,6 +334,25 @@ export const BRANDING_METHODS_OPTIONS = [
     maxPhysicalWidthMm: 320,
     maxPhysicalHeightMm: 450,
     imageUrl: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&q=80',
+  },
+  {
+    id: 'custom_branding',
+    name: 'Custom Branding',
+    category: 'Custom & Specialty',
+    group: 'Custom Specification',
+    defaultUnitPrice: 95.0,
+    icon: '⭐',
+    description: 'Custom branding method with tailor-made physical application instructions.',
+    defaultStock: 'Custom Specified Material / Substrate',
+    defaultColor: 'Custom Pantone / Spot Color Profile',
+    defaultFinishes: ['Custom Machine Finish', 'Tailored Production Run'],
+    defaultPlacement: 'Custom Branding',
+    placements: ['Custom Branding', 'Center Front Face', 'Left Chest (Pocket Area)', 'Full Wrap Area'],
+    defaultWidthMm: 120,
+    defaultHeightMm: 120,
+    maxPhysicalWidthMm: 500,
+    maxPhysicalHeightMm: 500,
+    imageUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&q=80',
   },
 ];
 
@@ -762,6 +782,7 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
   const [maxPhysicalWidthMm, setMaxPhysicalWidthMm] = useState<number>(300);
   const [maxPhysicalHeightMm, setMaxPhysicalHeightMm] = useState<number>(400);
   const [brandingMethod, setBrandingMethod] = useState<string>('3-Color Screen Printing');
+  const [customBrandingNotes, setCustomBrandingNotes] = useState<string>('');
   const [availablePlacements, setAvailablePlacements] = useState<string[]>(
     BRANDED_ITEMS_CATALOG[0].placements || ['Left Chest (Pocket Area)']
   );
@@ -972,6 +993,7 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
       maxPhysicalWidthMm: maxPhysicalWidthMm,
       maxPhysicalHeightMm: maxPhysicalHeightMm,
       brandingMethod: brandingMethod,
+      customBrandingNotes: customBrandingNotes.trim() || undefined,
     };
 
     const updatedItems = [...items, newItem];
@@ -980,6 +1002,7 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
     const updatedSub = updatedItems.reduce((acc, it) => acc + it.totalCost, 0);
     const updatedJob: Job = {
       ...job,
+      customBrandingNotes: customBrandingNotes.trim() || job.customBrandingNotes,
       quote: {
         ...job.quote,
         items: updatedItems,
@@ -1023,6 +1046,7 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
       maxPhysicalWidthMm: maxPhysicalWidthMm,
       maxPhysicalHeightMm: maxPhysicalHeightMm,
       brandingMethod: brandingMethod,
+      customBrandingNotes: customBrandingNotes.trim() || undefined,
     };
 
     setNewQuoteItems((prev) => [...prev, newItem]);
@@ -1219,36 +1243,36 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 font-sans text-slate-800 bg-transparent min-h-full">
+    <div className="p-6 sm:p-8 space-y-8 font-sans text-zinc-100 bg-transparent min-h-full">
       {/* Top Banner & Primary Action Toolbar */}
-      <div className="mirror-card p-4 sm:p-5 rounded-2xl shadow-xl flex flex-wrap justify-between items-center gap-4">
+      <div className="mirror-card p-5 sm:p-6 rounded-2xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.35)] flex flex-wrap justify-between items-center gap-4">
         <div>
-          <div className="flex items-center space-x-2 text-indigo-600 font-bold text-xs">
-            <Calculator className="w-4 h-4 text-indigo-600" />
-            <span>Estimating Engine — Quote #{job.quote.quoteNumber}</span>
-            <span className="px-2.5 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full font-bold text-[10px]">
+          <div className="flex items-center space-x-2 text-[#0a84ff] font-semibold text-xs">
+            <Calculator className="w-4 h-4 text-[#0a84ff]" />
+            <span>Estimating Engine • Quote #{job.quote.quoteNumber}</span>
+            <span className="px-2.5 py-0.5 bg-[#0a84ff]/15 text-[#0a84ff] border border-[#0a84ff]/30 rounded-full font-semibold text-[10px]">
               {job.quote.status || 'Active'}
             </span>
           </div>
-          <h2 className="text-lg font-black text-slate-900 mt-1">{job.projectName}</h2>
-          <div className="text-xs text-slate-500 flex items-center space-x-1.5 flex-wrap mt-0.5">
-            <span>Client: <strong className="text-slate-800">{job.companyName}</strong> ({job.customerName})</span>
-            <span className="text-slate-300">•</span>
+          <h2 className="text-xl font-bold text-white mt-1.5">{job.projectName}</h2>
+          <div className="text-xs text-slate-400 flex items-center space-x-2 flex-wrap mt-1">
+            <span>Client: <strong className="text-white font-semibold">{job.companyName}</strong> ({job.customerName})</span>
+            <span className="text-slate-600">•</span>
             <EmailLink
               email={job.customerEmail || `${job.customerName.toLowerCase().replace(/\s+/g, '.')}@${job.companyName.toLowerCase().replace(/\s+/g, '')}.co.za`}
               subject={`Quotation #${job.quote.quoteNumber} - ${job.projectName}`}
-              className="text-indigo-600 hover:text-indigo-800 text-xs font-bold"
+              className="text-[#0a84ff] hover:text-blue-400 text-xs font-semibold"
               showIcon
             />
-            <span className="text-slate-300">•</span>
-            <span>Rep: <strong className="text-indigo-700 font-bold">{job.quote.salesRep || job.salesRep}</strong></span>
+            <span className="text-slate-600">•</span>
+            <span>Rep: <strong className="text-slate-200 font-semibold">{job.quote.salesRep || job.salesRep}</strong></span>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           {/* Quick Active Quote Switcher Dropdown */}
           {allJobs.length > 0 && (
-            <div className="flex items-center space-x-1.5 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs shadow-2xs">
+            <div className="flex items-center space-x-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2 text-xs">
               <span className="text-slate-400 font-medium text-[11px]">Select Quote:</span>
               <select
                 value={job.id}
@@ -1256,10 +1280,10 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                   const targetJob = allJobs.find((j) => j.id === e.target.value);
                   if (targetJob && onSelectJob) onSelectJob(targetJob);
                 }}
-                className="bg-transparent font-bold text-indigo-600 outline-hidden cursor-pointer text-xs"
+                className="bg-transparent font-semibold text-[#0a84ff] outline-none cursor-pointer text-xs"
               >
                 {allJobs.map((j) => (
-                  <option key={j.id} value={j.id} className="bg-white text-slate-800">
+                  <option key={j.id} value={j.id} className="bg-[#18181b] text-white">
                     #{j.quote.quoteNumber} — {j.companyName} ({j.projectName})
                   </option>
                 ))}
@@ -1270,10 +1294,10 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
           {/* PRIMARY BUTTON: ADD NEW QUOTE */}
           <button
             onClick={() => setShowCreateNewQuoteModal(true)}
-            className="btn-amber-charcoal px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-md cursor-pointer transition-all hover:opacity-90"
+            className="px-4 py-2 bg-[#0a84ff] hover:bg-[#0071e3] text-white rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-lg shadow-blue-500/20 cursor-pointer transition-all border border-white/20 active:scale-[0.98]"
             title="Create a new quote from scratch for a new or existing client"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-white" />
             <span>+ Create New Quote</span>
           </button>
 
@@ -1287,7 +1311,7 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
               setEditDiscountPercent(discountPercent);
               setShowEditQuoteModal(true);
             }}
-            className="btn-amber-charcoal px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 cursor-pointer transition-colors shadow-2xs hover:opacity-90"
+            className="px-3.5 py-2 bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 border border-white/[0.08] rounded-xl text-xs font-semibold flex items-center space-x-1.5 cursor-pointer transition-colors active:scale-[0.98]"
             title="Edit quote client, title, discount rate, and line items"
           >
             <Edit3 className="w-4 h-4" />
@@ -1297,29 +1321,29 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
           {/* PRINT QUOTE BUTTON */}
           <button
             onClick={handleTriggerPrint}
-            className="btn-amber-charcoal px-3.5 py-2 font-bold rounded-xl text-xs flex items-center space-x-1.5 shadow-2xs cursor-pointer transition-colors hover:opacity-90"
+            className="px-3.5 py-2 bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 border border-white/[0.08] font-semibold rounded-xl text-xs flex items-center space-x-1.5 cursor-pointer transition-colors active:scale-[0.98]"
             title="Print formal quotation document"
           >
-            <Printer className="w-4 h-4 text-zinc-950" />
+            <Printer className="w-4 h-4 text-slate-300" />
             <span>Print Quote</span>
           </button>
 
           {/* EXPORT AS PDF BUTTON */}
           <button
             onClick={handleExportPDF}
-            className="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-xs cursor-pointer transition-colors"
+            className="px-3.5 py-2 bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 border border-white/[0.08] rounded-xl text-xs font-semibold flex items-center space-x-1.5 cursor-pointer transition-colors active:scale-[0.98]"
             title="Export official PDF document preview"
           >
-            <FileDown className="w-4 h-4 text-white" />
+            <FileDown className="w-4 h-4 text-[#0a84ff]" />
             <span>Export PDF</span>
           </button>
 
           <button
             onClick={() => onNavigate('ClientQuote')}
-            className="px-3.5 py-2 bg-zinc-800 hover:bg-zinc-700 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-xs cursor-pointer"
+            className="px-3.5 py-2 bg-white/[0.06] hover:bg-white/[0.1] text-[#0a84ff] border border-white/[0.08] rounded-xl text-xs font-semibold flex items-center space-x-1.5 cursor-pointer transition-colors active:scale-[0.98]"
           >
-            <span>View Formal View</span>
-            <ArrowRight className="w-4 h-4 text-amber-400" />
+            <span>Formal View</span>
+            <ArrowRight className="w-4 h-4 text-[#0a84ff]" />
           </button>
         </div>
       </div>
@@ -1327,38 +1351,38 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
       {/* Main Breakdown Grid Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Line Items Table & Specifications */}
-        <div className="lg:col-span-8 mirror-card bg-zinc-900/90 rounded-xl border border-zinc-800/80 shadow-xl p-5 space-y-4">
-          <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
-            <div className="flex items-center space-x-2">
-              <Layers className="w-4 h-4 text-amber-400" />
-              <h3 className="text-xs font-bold uppercase text-zinc-300 tracking-wider">
+        <div className="lg:col-span-8 mirror-card rounded-2xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6 space-y-5">
+          <div className="flex justify-between items-center border-b border-white/[0.08] pb-4">
+            <div className="flex items-center space-x-2.5">
+              <Layers className="w-4 h-4 text-[#0a84ff]" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
                 Production Line Item Breakdown & Specs
               </h3>
             </div>
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setShowAddFormModal(true)}
-                className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-lg text-xs font-black flex items-center space-x-1 cursor-pointer shadow-sm border border-amber-300/30 transition-all"
+                className="px-3.5 py-1.5 bg-[#0a84ff] hover:bg-[#0071e3] text-white rounded-xl text-xs font-semibold flex items-center space-x-1.5 cursor-pointer shadow-lg shadow-blue-500/20 border border-white/20 transition-all active:scale-95"
               >
-                <Plus className="w-3.5 h-3.5 text-zinc-950" />
+                <Plus className="w-3.5 h-3.5 text-white" />
                 <span>Configure Custom Item</span>
               </button>
             </div>
           </div>
 
           {/* Quick Branding Method Quick-Add Dropdown Bar */}
-          <div className="p-3 bg-zinc-950/90 border border-zinc-800 rounded-lg space-y-2 text-xs">
-            <div className="flex flex-wrap items-center justify-between gap-1 text-[11px]">
-              <span className="font-extrabold text-amber-300 flex items-center space-x-1.5">
-                <Palette className="w-3.5 h-3.5 text-amber-400" />
-                <span>QUICK ADD BRANDING METHOD DROPDOWN:</span>
+          <div className="p-4 bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-2xl space-y-3 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
+              <span className="font-bold text-[#0a84ff] flex items-center space-x-1.5">
+                <Palette className="w-3.5 h-3.5 text-[#0a84ff]" />
+                <span>QUICK ADD BRANDING METHOD:</span>
               </span>
-              <span className="text-[10px] text-zinc-400 font-semibold">
+              <span className="text-[10px] text-slate-400 font-medium">
                 Instant 1-Click Insertion into Quote
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
               <div className="sm:col-span-8">
                 <select
                   defaultValue=""
@@ -1368,31 +1392,31 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                       e.target.value = '';
                     }
                   }}
-                  className="w-full p-2 bg-zinc-900 border border-zinc-700 rounded-lg font-bold text-zinc-100 text-xs focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                  className="w-full p-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl font-medium text-white text-xs focus:ring-2 focus:ring-[#0a84ff]/40 focus:border-[#0a84ff] outline-none cursor-pointer"
                 >
-                  <option value="">⚡ Select Branding Method to Add (DTF, Embroidery, Silk Screen, Foiling, Embossing...)</option>
-                  <optgroup label="🔥 Apparel & Fabric Transfers" className="bg-zinc-900 text-zinc-200">
+                  <option value="" className="bg-[#18181b] text-slate-400">⚡ Select Branding Method to Add (DTF, Embroidery, Silk Screen, Foiling, Embossing...)</option>
+                  <optgroup label="🔥 Apparel & Fabric Transfers" className="bg-[#18181b] text-slate-200">
                     <option value="dtf_printing">🎨 DTF (Direct To Film Transfers) — R95.00/ea</option>
                     <option value="silk_screen_printing">🖨️ Silk Screening / Screen Printing — R75.00/ea</option>
                     <option value="heat_press_vinyl">🔥 Heat Press Vinyl & Thermal Transfers — R75.00/ea</option>
                     <option value="sublimation_textile">🎽 Dye Sublimation & Roll-to-Roll — R140.00/ea</option>
                   </optgroup>
-                  <optgroup label="🪡 Threadwork & Embroidery" className="bg-zinc-900 text-zinc-200">
+                  <optgroup label="🪡 Threadwork & Embroidery" className="bg-[#18181b] text-slate-200">
                     <option value="embroidery_flat">🪡 Embroidery (Flat Stitch & Badges) — R85.00/ea</option>
                     <option value="embroidery_3d_puff">🧵 3D Puff Raised Embroidery — R115.00/ea</option>
                   </optgroup>
-                  <optgroup label="✨ Specialty Dies & Luxury Finishes" className="bg-zinc-900 text-zinc-200">
+                  <optgroup label="✨ Specialty Dies & Luxury Finishes" className="bg-[#18181b] text-slate-200">
                     <option value="hot_foil_stamping">✨ Hot Stamped Foiling (Gold/Silver) — R65.00/ea</option>
                     <option value="embossing">🏷️ Embossing (Raised 3D Blind/Foil Relief) — R70.00/ea</option>
                     <option value="debossing">🔲 Debossing (Recessed Stamped Imprint) — R70.00/ea</option>
                   </optgroup>
-                  <optgroup label="💎 Direct Industrial & Signage" className="bg-zinc-900 text-zinc-200">
+                  <optgroup label="💎 Direct Industrial & Signage" className="bg-[#18181b] text-slate-200">
                     <option value="uv_flatbed_printing">💎 LED UV Full Colour Printing (Flatbed) — R110.00/ea</option>
                     <option value="laser_engraving">⚡ Laser Cutting & Engraving — R80.00/ea</option>
                     <option value="signage_acrylic_plaque">🪧 Signboards & Acrylic Standoff Plaques — R280.00/ea</option>
                     <option value="vinyl_plotter_decals">✂️ Vinyl Cut-Out Decals & Lettering — R85.00/ea</option>
                   </optgroup>
-                  <optgroup label="🖊️ Promotional & Commercial Print" className="bg-zinc-900 text-zinc-200">
+                  <optgroup label="🖊️ Promotional & Commercial Print" className="bg-[#18181b] text-slate-200">
                     <option value="pad_printing">🖊️ Pad Printing (Drinkware & Pens) — R45.00/ea</option>
                     <option value="commercial_offset_print">📄 Commercial Digital & Offset Litho — R2.50/ea</option>
                   </optgroup>
@@ -1403,17 +1427,17 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAddFormModal(true)}
-                  className="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-amber-300 rounded-lg font-extrabold text-xs flex items-center justify-center space-x-1 border border-zinc-700 cursor-pointer transition-colors"
+                  className="w-full py-2.5 bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 rounded-xl font-semibold text-xs flex items-center justify-center space-x-1.5 border border-white/[0.08] cursor-pointer transition-colors active:scale-95"
                 >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Interactive Mockup Form</span>
+                  <Eye className="w-3.5 h-3.5 text-[#0a84ff]" />
+                  <span>Interactive Mockup</span>
                 </button>
               </div>
             </div>
 
             {/* Quick-add chips */}
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="text-[10px] font-bold text-zinc-400">Quick Add:</span>
+              <span className="text-[10px] font-semibold text-slate-400">Quick Add:</span>
               {[
                 { id: 'dtf_printing', label: '🎨 DTF' },
                 { id: 'embroidery_flat', label: '🪡 Embroidery' },
@@ -1429,7 +1453,7 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                   key={chip.id}
                   type="button"
                   onClick={() => handleQuickInsertBrandingMethodToQuote(chip.id)}
-                  className="px-2 py-0.5 rounded bg-zinc-900 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-300 border border-zinc-800 hover:border-amber-500/40 text-[10px] font-bold transition-all cursor-pointer shadow-2xs"
+                  className="px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-[#0a84ff]/20 text-slate-300 hover:text-white border border-white/[0.08] hover:border-[#0a84ff]/40 text-[10px] font-medium transition-all cursor-pointer shadow-2xs"
                 >
                   {chip.label}
                 </button>
@@ -1437,7 +1461,7 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             {items.map((item, idx) => {
               const exceedsWidth =
                 item.brandingWidthMm && item.maxPhysicalWidthMm && item.brandingWidthMm > item.maxPhysicalWidthMm;
@@ -1448,12 +1472,12 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
               return (
                 <div
                   key={idx}
-                  className="p-4 bg-zinc-950/70 border border-zinc-800/80 rounded-xl space-y-3 text-xs hover:border-zinc-700 transition-colors"
+                  className="p-4 bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-2xl space-y-3.5 text-xs hover:border-white/[0.16] transition-colors"
                 >
                   <div className="flex justify-between items-start gap-3">
-                    <div className="flex items-start space-x-3">
+                    <div className="flex items-start space-x-3.5">
                       {item.imageUrl ? (
-                        <div className="w-16 h-16 rounded-lg border border-zinc-700 overflow-hidden bg-zinc-900 shadow-xs shrink-0">
+                        <div className="w-16 h-16 rounded-xl border border-white/[0.1] overflow-hidden bg-white/[0.02] shadow-xs shrink-0">
                           <img
                             src={item.imageUrl}
                             alt={item.description}
@@ -1462,16 +1486,16 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                           />
                         </div>
                       ) : (
-                        <div className="w-12 h-12 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-300 shrink-0 font-bold text-xs">
-                          <Tag className="w-5 h-5 text-amber-400" />
+                        <div className="w-12 h-12 rounded-xl bg-[#0a84ff]/15 border border-[#0a84ff]/30 flex items-center justify-center text-[#0a84ff] shrink-0 font-bold text-xs">
+                          <Tag className="w-5 h-5 text-[#0a84ff]" />
                         </div>
                       )}
 
                       <div className="space-y-1">
-                        <div className="text-zinc-100 font-extrabold text-sm flex items-center space-x-2">
+                        <div className="text-white font-bold text-sm flex items-center space-x-2">
                           <span>{item.description}</span>
                           {item.category && (
-                            <span className="text-[10px] bg-zinc-800 text-zinc-300 font-semibold px-2 py-0.5 rounded-full border border-zinc-700">
+                            <span className="text-[10px] bg-white/[0.06] text-slate-300 font-medium px-2 py-0.5 rounded-full border border-white/[0.08]">
                               {item.category}
                             </span>
                           )}
@@ -1481,15 +1505,15 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                         {(item.brandingPlacement || item.brandingWidthMm) && (
                           <div className="flex flex-wrap items-center gap-1.5 text-[11px] pt-0.5">
                             {item.brandingPlacement && (
-                              <span className="px-2 py-0.5 bg-amber-500/15 text-amber-300 font-bold rounded border border-amber-500/30 flex items-center space-x-1">
-                                <MapPin className="w-3 h-3 text-amber-400 inline" />
+                              <span className="px-2.5 py-0.5 bg-[#0a84ff]/15 text-[#0a84ff] font-semibold rounded-full border border-[#0a84ff]/30 flex items-center space-x-1">
+                                <MapPin className="w-3 h-3 text-[#0a84ff] inline" />
                                 <span>{item.brandingPlacement}</span>
                               </span>
                             )}
 
                             {item.brandingWidthMm && item.brandingHeightMm && (
-                              <span className="px-2 py-0.5 bg-zinc-800 text-amber-300 font-bold font-mono rounded border border-zinc-700 flex items-center space-x-1">
-                                <Ruler className="w-3 h-3 text-amber-400 inline" />
+                              <span className="px-2.5 py-0.5 bg-white/[0.06] text-slate-300 font-semibold font-mono rounded-full border border-white/[0.08] flex items-center space-x-1">
+                                <Ruler className="w-3 h-3 text-slate-400 inline" />
                                 <span>
                                   {item.brandingWidthMm}×{item.brandingHeightMm} mm
                                 </span>
@@ -1498,10 +1522,10 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
 
                             {item.maxPhysicalWidthMm && item.maxPhysicalHeightMm && (
                               <span
-                                className={`px-2 py-0.5 font-bold rounded border flex items-center space-x-1 text-[10px] ${
+                                className={`px-2.5 py-0.5 font-semibold rounded-full border flex items-center space-x-1 text-[10px] ${
                                   isOverLimit
-                                    ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                                    : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                                    ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                                    : 'bg-[#30d158]/15 text-[#30d158] border-[#30d158]/30'
                                 }`}
                               >
                                 {isOverLimit ? (
@@ -1511,12 +1535,27 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                                   </>
                                 ) : (
                                   <>
-                                    <CheckCircle2 className="w-3 h-3 text-emerald-400 inline" />
+                                    <CheckCircle2 className="w-3 h-3 text-[#30d158] inline" />
                                     <span>Fits Machine ({item.maxPhysicalWidthMm}×{item.maxPhysicalHeightMm}mm)</span>
                                   </>
                                 )}
                               </span>
                             )}
+                          </div>
+                        )}
+
+                        {/* Custom Branding Requirements Directive */}
+                        {item.customBrandingNotes && (
+                          <div className="mt-2 p-2.5 bg-amber-500/10 border border-amber-400/30 rounded-xl text-xs flex items-start space-x-2">
+                            <Edit3 className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                            <div>
+                              <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
+                                Custom Branding Directive:
+                              </span>
+                              <span className="text-slate-200 font-sans text-[11px] leading-relaxed">
+                                {item.customBrandingNotes}
+                              </span>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1526,10 +1565,10 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                       <button
                         type="button"
                         onClick={() => setActivePreviewIndex(activePreviewIndex === idx ? null : idx)}
-                        className={`px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 border transition-colors cursor-pointer ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 border transition-colors cursor-pointer active:scale-95 ${
                           activePreviewIndex === idx
-                            ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 border-amber-400 font-black'
-                            : 'bg-zinc-800/80 text-amber-300 border-zinc-700 hover:bg-zinc-800'
+                            ? 'bg-[#0a84ff] text-white border-white/20 shadow-lg shadow-blue-500/20'
+                            : 'bg-white/[0.06] text-slate-200 border-white/[0.08] hover:bg-white/[0.1]'
                         }`}
                         title="Toggle branding placement visualizer and physical limits inspector"
                       >
@@ -1539,7 +1578,7 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
 
                       <button
                         onClick={() => removeItemFromCurrentQuote(idx)}
-                        className="text-zinc-500 hover:text-rose-400 p-1.5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-zinc-800"
+                        className="text-slate-400 hover:text-rose-400 p-1.5 rounded-xl transition-colors cursor-pointer hover:bg-white/[0.06]"
                         title="Delete item from quote"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1547,34 +1586,34 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] pt-1 bg-zinc-900/90 p-3 rounded-lg border border-zinc-800">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px] pt-1 bg-white/[0.03] backdrop-blur-xl p-3.5 rounded-xl border border-white/[0.06]">
                     <div>
-                      <span className="text-zinc-500 block">Stock / Material:</span>
-                      <span className="font-semibold text-zinc-200">{item.paperStock}</span>
+                      <span className="text-slate-400 block">Stock / Material:</span>
+                      <span className="font-semibold text-slate-200 mt-0.5 block">{item.paperStock}</span>
                     </div>
                     <div>
-                      <span className="text-zinc-500 block">Color Mode:</span>
-                      <span className="font-semibold text-zinc-200">{item.colorProfile}</span>
+                      <span className="text-slate-400 block">Color Mode:</span>
+                      <span className="font-semibold text-slate-200 mt-0.5 block">{item.colorProfile}</span>
                     </div>
                     <div>
-                      <span className="text-zinc-500 block">Quantity Run:</span>
-                      <span className="font-bold text-amber-400 font-mono">
+                      <span className="text-slate-400 block">Quantity Run:</span>
+                      <span className="font-bold text-[#0a84ff] font-mono mt-0.5 block">
                         {item.quantity.toLocaleString()} units
                       </span>
                     </div>
                     <div>
-                      <span className="text-zinc-500 block">Line Total:</span>
-                      <span className="font-extrabold text-zinc-100 font-mono">
+                      <span className="text-slate-400 block">Line Total:</span>
+                      <span className="font-bold text-white font-mono mt-0.5 block">
                         R {item.totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-1 pt-0.5">
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
                     {item.finishes.map((f, fi) => (
                       <span
                         key={fi}
-                        className="px-2 py-0.5 bg-zinc-800 text-amber-300 rounded text-[10px] font-semibold border border-zinc-700"
+                        className="px-2.5 py-0.5 bg-white/[0.04] text-slate-300 rounded-full text-[10px] font-medium border border-white/[0.08]"
                       >
                         + {f}
                       </span>
@@ -1593,8 +1632,9 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                         maxPhysicalWidthMm={item.maxPhysicalWidthMm}
                         maxPhysicalHeightMm={item.maxPhysicalHeightMm}
                         brandingMethod={item.brandingMethod}
+                        customBrandingNotes={item.customBrandingNotes}
                         interactive={true}
-                        onUpdatePlacement={(newPlacement, newW, newH, newMethod) => {
+                        onUpdatePlacement={(newPlacement, newW, newH, newMethod, _pX, _pY, newNotes) => {
                           const updated = [...items];
                           updated[idx] = {
                             ...updated[idx],
@@ -1602,8 +1642,37 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                             brandingWidthMm: newW,
                             brandingHeightMm: newH,
                             brandingMethod: newMethod || updated[idx].brandingMethod,
+                            customBrandingNotes: newNotes !== undefined ? newNotes : updated[idx].customBrandingNotes,
                           };
                           setItems(updated);
+                          if (onSaveJob) {
+                            onSaveJob({
+                              ...job,
+                              customBrandingNotes: newNotes || updated[idx].customBrandingNotes,
+                              quote: {
+                                ...job.quote,
+                                items: updated,
+                              },
+                            });
+                          }
+                        }}
+                        onUpdateCustomNotes={(notes) => {
+                          const updated = [...items];
+                          updated[idx] = {
+                            ...updated[idx],
+                            customBrandingNotes: notes,
+                          };
+                          setItems(updated);
+                          if (onSaveJob) {
+                            onSaveJob({
+                              ...job,
+                              customBrandingNotes: notes,
+                              quote: {
+                                ...job.quote,
+                                items: updated,
+                              },
+                            });
+                          }
                         }}
                       />
                     </div>
@@ -1613,12 +1682,12 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
             })}
 
             {items.length === 0 && (
-              <div className="p-8 text-center bg-zinc-950/60 border border-dashed border-zinc-800 rounded-xl space-y-2">
-                <ShoppingBag className="w-8 h-8 text-zinc-600 mx-auto" />
-                <p className="text-xs font-bold text-zinc-400">No line items added to this quotation yet.</p>
+              <div className="p-8 text-center bg-white/[0.02] border border-dashed border-white/[0.12] rounded-2xl space-y-3">
+                <ShoppingBag className="w-8 h-8 text-slate-500 mx-auto" />
+                <p className="text-xs font-semibold text-slate-400">No line items added to this quotation yet.</p>
                 <button
                   onClick={() => setShowAddFormModal(true)}
-                  className="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 font-black text-xs rounded-lg cursor-pointer shadow-md"
+                  className="px-4 py-2 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-semibold text-xs rounded-xl cursor-pointer shadow-lg shadow-blue-500/20 active:scale-95"
                 >
                   Add First Branding Item
                 </button>
@@ -1628,10 +1697,10 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
         </div>
 
         {/* Cost Summary & Save/Print Actions */}
-        <div className="lg:col-span-4 mirror-card bg-zinc-900/90 rounded-xl border border-zinc-800/80 shadow-xl p-5 space-y-4 flex flex-col justify-between">
+        <div className="lg:col-span-4 mirror-card rounded-2xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6 space-y-6 flex flex-col justify-between">
           <div>
-            <div className="flex justify-between items-center border-b border-zinc-800 pb-2 mb-3">
-              <h3 className="text-xs font-bold uppercase text-zinc-300">
+            <div className="flex justify-between items-center border-b border-white/[0.08] pb-3 mb-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
                 Financial Summary & VAT Breakdown
               </h3>
               <button
@@ -1643,77 +1712,77 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                   setEditDiscountPercent(discountPercent);
                   setShowEditQuoteModal(true);
                 }}
-                className="text-[11px] font-bold text-amber-400 hover:text-amber-300 flex items-center space-x-1 cursor-pointer transition-colors"
+                className="text-[11px] font-semibold text-[#0a84ff] hover:text-blue-400 flex items-center space-x-1 cursor-pointer transition-colors"
               >
                 <Edit3 className="w-3 h-3" />
-                <span>Edit Financials</span>
+                <span>Edit</span>
               </button>
             </div>
 
-            <div className="space-y-2 text-xs font-medium">
-              <div className="flex justify-between text-zinc-400">
+            <div className="space-y-3 text-xs font-medium">
+              <div className="flex justify-between text-slate-400">
                 <span>Production Subtotal:</span>
-                <span className="font-mono text-zinc-100 font-bold">
-                  R {rawSubtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span className="font-mono text-white font-semibold">
+                  {formatRands(rawSubtotal, { decimals: true })}
                 </span>
               </div>
 
-              <div className="flex justify-between items-center text-zinc-400">
+              <div className="flex justify-between items-center text-slate-400">
                 <span>Contract Discount ({discountPercent}%):</span>
-                <span className="font-mono text-rose-400 font-bold">
-                  -R {discountVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span className="font-mono text-rose-400 font-semibold">
+                  -{formatRands(discountVal, { decimals: true })}
                 </span>
               </div>
 
-              <div className="flex justify-between text-zinc-400">
+              <div className="flex justify-between text-slate-400">
                 <span>Taxable Amount:</span>
-                <span className="font-mono text-zinc-100 font-bold">
-                  R {taxable.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span className="font-mono text-white font-semibold">
+                  {formatRands(taxable, { decimals: true })}
                 </span>
               </div>
 
-              <div className="flex justify-between text-zinc-400">
+              <div className="flex justify-between text-slate-400">
                 <span>VAT / Sales Tax (15% ZAR):</span>
-                <span className="font-mono text-zinc-100 font-bold">
-                  R {vatTax.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span className="font-mono text-white font-semibold">
+                  {formatRands(vatTax, { decimals: true })}
                 </span>
               </div>
 
-              <div className="border-t border-zinc-700/80 pt-2 flex justify-between items-center text-sm font-black text-zinc-100">
+              <div className="border-t border-white/[0.08] pt-3 flex justify-between items-center text-sm font-bold text-white">
                 <span>Grand Total:</span>
-                <span className="font-mono text-amber-400 text-base font-black">
-                  R {grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span className="font-mono text-[#0a84ff] text-lg font-bold">
+                  {formatRands(grandTotal, { decimals: true })}
                 </span>
               </div>
             </div>
 
-            <div className="mt-4 p-3 bg-zinc-950/80 border border-emerald-500/30 rounded-lg text-xs space-y-1">
-              <div className="font-bold text-emerald-400 flex items-center justify-between">
+            <div className="mt-5 p-4 bg-white/[0.03] backdrop-blur-xl border border-[#30d158]/30 rounded-2xl text-xs space-y-1">
+              <div className="font-semibold text-[#30d158] flex items-center justify-between">
                 <span>Accounts Sync Status</span>
-                <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold rounded border border-emerald-500/40">
+                <span className="px-2.5 py-0.5 bg-[#30d158]/15 text-[#30d158] text-[10px] font-semibold rounded-full border border-[#30d158]/30">
                   LIVE IN SYNC
                 </span>
               </div>
-              <p className="text-[11px] text-zinc-400">
+              <p className="text-[11px] text-slate-400 mt-1">
                 Quotations automatically mirror in Client Approvals, Accounts Ledger, and Invoicing.
               </p>
             </div>
           </div>
 
-          <div className="space-y-2 pt-2">
+          <div className="space-y-2.5 pt-4">
             <button
               onClick={() => setShowCreateNewQuoteModal(true)}
-              className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-lg text-xs font-black shadow-md shadow-amber-500/20 cursor-pointer flex justify-center items-center space-x-1.5 transition-all border border-amber-300/30"
+              className="w-full py-3 bg-[#0a84ff] hover:bg-[#0071e3] text-white rounded-xl text-xs font-semibold shadow-lg shadow-blue-500/20 cursor-pointer flex justify-center items-center space-x-2 transition-all border border-white/20 active:scale-[0.98]"
             >
-              <Plus className="w-4 h-4 text-zinc-950" />
+              <Plus className="w-4 h-4 text-white" />
               <span>+ Create New Quotation</span>
             </button>
 
             <button
               onClick={handleTriggerPrint}
-              className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-zinc-950 rounded-lg text-xs font-bold shadow-xs cursor-pointer flex justify-center items-center space-x-1.5 transition-colors"
+              className="w-full py-2.5 bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 border border-white/[0.08] rounded-xl text-xs font-semibold cursor-pointer flex justify-center items-center space-x-2 transition-colors active:scale-[0.98]"
             >
-              <Printer className="w-4 h-4 text-zinc-950" />
+              <Printer className="w-4 h-4 text-slate-300" />
               <span>Print Official Quote</span>
             </button>
 
@@ -1722,9 +1791,9 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                 onSaveNotification(`Quotation #${job.quote.quoteNumber} saved and locked for client review.`);
                 onNavigate('ClientQuote');
               }}
-              className="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 rounded-lg text-xs font-bold shadow-xs cursor-pointer flex justify-center items-center space-x-1"
+              className="w-full py-2.5 bg-white/[0.06] hover:bg-white/[0.1] text-[#0a84ff] border border-white/[0.08] rounded-xl text-xs font-semibold cursor-pointer flex justify-center items-center space-x-2 active:scale-[0.98]"
             >
-              <FileCheck className="w-4 h-4 text-amber-400" />
+              <FileCheck className="w-4 h-4 text-[#0a84ff]" />
               <span>Send Quotation to Client</span>
             </button>
           </div>
@@ -2457,6 +2526,9 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                       }}
                       className="w-full p-2 bg-white border border-slate-300 rounded font-bold text-slate-900 text-xs"
                     >
+                      <optgroup label="⭐ Custom Specification">
+                        <option value="Custom Branding">⭐ Custom Branding (Special Specification)</option>
+                      </optgroup>
                       <optgroup label="🔥 Apparel & Fabric Transfers">
                         <option value="DTF (Direct To Film Transfers)">🎨 DTF (Direct To Film Transfers)</option>
                         <option value="Silk Screening / Screen Printing">🖨️ Silk Screening / Screen Printing</option>
@@ -2484,6 +2556,7 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                       </optgroup>
                       {/* If current custom value not in list */}
                       {![
+                        'Custom Branding',
                         'DTF (Direct To Film Transfers)',
                         'Silk Screening / Screen Printing',
                         'Heat Press Vinyl & Thermal Transfer (PU / Flock / Reflective)',
@@ -2519,9 +2592,40 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                           {loc}
                         </option>
                       ))}
+                      {!availablePlacements.includes('Custom Branding') && (
+                        <option value="Custom Branding">⭐ Custom Branding (Custom Placement)</option>
+                      )}
                     </select>
                   </div>
                 </div>
+
+                {/* Custom Branding Requirements Box (Visible when Custom Branding is selected or notes exist) */}
+                {(brandingMethod === 'Custom Branding' || brandingPlacement === 'Custom Branding' || customBrandingNotes.length > 0) && (
+                  <div className="p-3 bg-amber-50 border border-amber-300 rounded-lg space-y-1.5 animate-fadeIn">
+                    <div className="flex items-center justify-between text-xs font-bold text-amber-900">
+                      <span className="flex items-center space-x-1.5">
+                        <Edit3 className="w-3.5 h-3.5 text-amber-700" />
+                        <span>Custom Branding Requirements</span>
+                      </span>
+                      <span className={`text-[11px] font-mono font-bold ${customBrandingNotes.length >= 190 ? 'text-red-600' : 'text-amber-800'}`}>
+                        {customBrandingNotes.length}/200 characters
+                      </span>
+                    </div>
+                    <textarea
+                      id="modal-custom-branding-notes"
+                      value={customBrandingNotes}
+                      maxLength={200}
+                      onChange={(e) => setCustomBrandingNotes(e.target.value.slice(0, 200))}
+                      placeholder="Type what is required (Pantone colors, special positioning, thread specs, machine instructions)..."
+                      rows={2}
+                      className="w-full p-2 bg-white border border-amber-300 rounded text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-500 resize-none font-sans"
+                    />
+                    <div className="flex items-center justify-between text-[10px] text-amber-800">
+                      <span>These notes will follow the procedure throughout the website.</span>
+                      <span className="font-mono font-bold text-amber-900">{200 - customBrandingNotes.length} left</span>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -2572,12 +2676,17 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                     maxPhysicalWidthMm={maxPhysicalWidthMm}
                     maxPhysicalHeightMm={maxPhysicalHeightMm}
                     brandingMethod={brandingMethod}
+                    customBrandingNotes={customBrandingNotes}
                     interactive={true}
-                    onUpdatePlacement={(newPlacement, newW, newH, newMethod) => {
+                    onUpdatePlacement={(newPlacement, newW, newH, newMethod, _pX, _pY, newNotes) => {
                       setBrandingPlacement(newPlacement);
                       setBrandingWidthMm(newW);
                       setBrandingHeightMm(newH);
                       if (newMethod) setBrandingMethod(newMethod);
+                      if (newNotes !== undefined) setCustomBrandingNotes(newNotes);
+                    }}
+                    onUpdateCustomNotes={(notes) => {
+                      setCustomBrandingNotes(notes);
                     }}
                   />
                 </div>
@@ -2760,6 +2869,11 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                           <div className="text-[11px] text-slate-500 mt-0.5">
                             Stock: {item.paperStock} • Color: {item.colorProfile}
                           </div>
+                          {item.customBrandingNotes && (
+                            <div className="mt-1 px-2 py-1 bg-amber-50 border border-amber-300 rounded text-[10px] text-amber-900 font-medium">
+                              <strong>Custom Branding Directive:</strong> {item.customBrandingNotes}
+                            </div>
+                          )}
                           <div className="flex flex-wrap gap-1 mt-1">
                             {item.finishes.map((f, fi) => (
                               <span key={fi} className="px-1.5 py-0.5 bg-slate-100 text-slate-700 text-[9px] font-medium rounded border border-slate-200">
@@ -2788,19 +2902,19 @@ export const QuotationsModule: React.FC<QuotationsModuleProps> = ({
                   <div className="w-64 space-y-1.5 text-xs font-medium">
                     <div className="flex justify-between text-slate-600">
                       <span>Subtotal:</span>
-                      <span className="font-mono font-bold text-slate-900">R {rawSubtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className="font-mono font-bold text-slate-900">{formatRands(rawSubtotal, { decimals: true })}</span>
                     </div>
                     <div className="flex justify-between text-slate-600">
                       <span>Discount ({discountPercent}%):</span>
-                      <span className="font-mono font-bold text-red-600">-R {discountVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className="font-mono font-bold text-red-600">-{formatRands(discountVal, { decimals: true })}</span>
                     </div>
                     <div className="flex justify-between text-slate-600">
                       <span>VAT (15% ZAR):</span>
-                      <span className="font-mono font-bold text-slate-900">R {vatTax.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className="font-mono font-bold text-slate-900">{formatRands(vatTax, { decimals: true })}</span>
                     </div>
                     <div className="border-t-2 border-slate-900 pt-2 flex justify-between text-sm font-black text-slate-900">
                       <span>Grand Total:</span>
-                      <span className="font-mono text-emerald-700">R {grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className="font-mono text-emerald-700">{formatRands(grandTotal, { decimals: true })}</span>
                     </div>
                   </div>
                 </div>

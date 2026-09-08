@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CreditCard, DollarSign, Clock, CheckCircle2, ArrowRight, Plus } from 'lucide-react';
 import { Job } from '../../types';
+import { formatRands } from '../../utils/formatters';
 
 interface PaymentTrackingModuleProps {
   job: Job;
@@ -40,7 +41,7 @@ export const PaymentTrackingModule: React.FC<PaymentTrackingModuleProps> = ({
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-zinc-950 min-h-full">
+    <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-transparent min-h-full">
       <div className="mirror-card p-4 sm:p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/90 shadow-xl flex flex-wrap justify-between items-center gap-3">
         <div>
           <div className="flex items-center space-x-2 text-xs font-bold text-amber-400">
@@ -85,7 +86,7 @@ export const PaymentTrackingModule: React.FC<PaymentTrackingModuleProps> = ({
                 </div>
                 <div className="text-right">
                   <div className="font-mono font-bold text-emerald-400 text-sm">
-                    +R {p.amount.toLocaleString()}
+                    +{formatRands(p.amount)}
                   </div>
                   <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold rounded">
                     {p.status}

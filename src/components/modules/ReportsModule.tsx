@@ -1,6 +1,7 @@
 import React from 'react';
 import { PieChart, TrendingUp, BarChart3, Download, Printer, Layers } from 'lucide-react';
 import { Job } from '../../types';
+import { formatRands } from '../../utils/formatters';
 
 interface ReportsModuleProps {
   jobs: Job[];
@@ -11,7 +12,7 @@ export const ReportsModule: React.FC<ReportsModuleProps> = ({ jobs, onSaveNotifi
   const totalRev = jobs.reduce((s, j) => s + j.totalValue, 0);
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-zinc-950 min-h-full">
+    <div className="p-4 sm:p-6 space-y-6 font-sans text-zinc-100 bg-transparent min-h-full">
       <div className="mirror-card p-4 sm:p-5 rounded-xl border border-zinc-800/80 bg-zinc-900/90 shadow-xl flex flex-wrap justify-between items-center gap-3">
         <div>
           <div className="flex items-center space-x-2 text-xs font-bold text-amber-400">
@@ -33,7 +34,7 @@ export const ReportsModule: React.FC<ReportsModuleProps> = ({ jobs, onSaveNotifi
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
         <div className="mirror-card p-5 bg-zinc-900/90 rounded-xl border border-zinc-800/80 shadow-xl">
           <div className="text-zinc-400 font-bold uppercase text-[10px]">Total Active Revenue</div>
-          <div className="text-2xl font-black text-amber-400 font-mono mt-1">R {totalRev.toLocaleString()}</div>
+          <div className="text-2xl font-black text-amber-400 font-mono mt-1">{formatRands(totalRev)}</div>
           <div className="text-emerald-400 text-[11px] font-bold mt-1">42.8% Average Margin</div>
         </div>
 
